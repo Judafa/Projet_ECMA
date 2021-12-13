@@ -13,19 +13,35 @@
 \maketitle
 
 \begin{questions}
-	\question Voici le problème statique:
-	\begin{align*}
-		\left(\mathcal{P}\right) \left\{
-		\begin{array}{ll}
-			\min &\sum\limits_{(i, j) \in A} d_{ij} \: x_{ij}\\
-			\text{s.c.}\\
-			&\sum\limits_{(i, j) \in A} p_{i} \: x_{ij} \leq S - p_{t}\\
-			&\sum\limits_{j \in \delta^{+}(i)} x_{ji} \ - \sum\limits_{j \in \delta^{-}(i)} x_{ij} = 0 \quad \forall i \in A \setminus \{s, t\}\\
-			&\sum\limits_{j \in \delta^{-}(s)} x_{sj} = 1\\
-			&\sum\limits_{j \in \delta^{+}(t)} x_{jt} = 1\\
-		\end{array}
-		\right.
-	\end{align*}
+\question Voici le problème statique $\left(\mathcal{P}\right)$:
+\begin{align*}
+	\left(\mathcal{P}\right) \left\{
+	\begin{array}{ll}
+		\min &\sum\limits_{(i, j) \in A} d_{ij} \: x_{ij}\\
+		\text{s.c.}\\
+		&\sum\limits_{(i, j) \in A} p_{i} \: x_{ij} \leq S - p_{t}\\
+		&\sum\limits_{j \in \delta^{+}(i)} x_{ji} \ - \sum\limits_{j \in \delta^{-}(i)} x_{ij} = 0 \quad \forall i \in A \setminus \{s, t\}\\
+		&\sum\limits_{j \in \delta^{-}(s)} x_{sj} = 1\\
+		&\sum\limits_{j \in \delta^{+}(t)} x_{jt} = 1\\
+	\end{array}
+	\right.
+\end{align*}
+
+\question Modélisation du problème robuste $\left(\mathcal{P}_{r}\right)$:
+
+\begin{align*}
+	\left(\mathcal{P}_{r}\right) \left\{
+	\begin{array}{ll}
+		\min\limits_{x} \max\limits_{\delta^{1}} &\sum\limits_{(i, j) \in A} d_{ij} \: (1 + \delta^{1}_{ij}) \: x_{ij}\\
+		\text{s.c.}\\
+		\vspace{1em} &\sum\limits_{(i, j) \in A} p_{i} \: x_{ij} + \max\limits_{\delta^{2}}\left\{\delta^{2}_{t} \hat{p}_{t} + \sum\limits_{(i, j) \in A} \delta^{2}_{i} \: \hat{p}_{i} \: x_{ij} \right\} \leq S - p_{t}\\
+		&\sum\limits_{j \in \delta^{+}(i)} x_{ji} \ - \sum\limits_{j \in \delta^{-}(i)} x_{ij} = 0 \quad \forall i \in A \setminus \{s, t\}\\
+		&\sum\limits_{j \in \delta^{-}(s)} x_{sj} = 1\\
+		&\sum\limits_{j \in \delta^{+}(t)} x_{jt} = 1\\
+	\end{array}
+	\right.
+\end{align*}
+
 \end{questions}
 
 \end{document}
