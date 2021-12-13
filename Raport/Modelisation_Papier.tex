@@ -1,0 +1,32 @@
+\documentclass[11pt,a4paper]{exam}
+
+% For maths symbols
+\usepackage{amsmath, amssymb, bm}
+\usepackage{wasysym, bigints}
+
+% Langue
+\usepackage[french]{babel}
+
+\title{Modélisation Papier}
+\author{Antonio Costa, Julien Dallot}
+\begin{document}
+\maketitle
+
+\begin{questions}
+	\question Voici le problème statique:
+	\begin{align*}
+		\left(\mathcal{P}\right) \left\{
+		\begin{array}{ll}
+			\min &\sum\limits_{(i, j) \in A} d_{ij} \: x_{ij}\\
+			\text{s.c.}\\
+			&\sum\limits_{(i, j) \in A} p_{i} \: x_{ij} \leq S - p_{t}\\
+			&\sum\limits_{j \in \delta^{+}(i)} x_{ji} \ - \sum\limits_{j \in \delta^{-}(i)} x_{ij} = 0 \quad \forall i \in A \setminus \{s, t\}\\
+			&\sum\limits_{j \in \delta^{-}(s)} x_{sj} = 1\\
+			&\sum\limits_{j \in \delta^{+}(t)} x_{jt} = 1\\
+		\end{array}
+		\right.
+	\end{align*}
+\end{questions}
+
+\end{document}
+
