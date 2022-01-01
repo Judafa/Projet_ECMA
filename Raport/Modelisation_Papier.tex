@@ -112,7 +112,8 @@ avec $x^{*}$ une solution courante du problème maître. Soient $\delta^{1*}$ et
 
 À chaque itération, on ajoute les contraintes suivantes. Si $\sum\limits_{ij \in A} d_{ij} \ (1 + \delta^{1}_{ij}) \ x^{*}_{ij} > z^{*}$, alors on coupe cette mauvaise solution $x^{*}$ en rajoutant l'inégalité $\sum\limits_{ij \in A} d_{ij} \ (1 + \delta^{1}_{ij}) \ x_{ij} \leq z^{*}$. De même si $\sum\limits_{i \in V} (p_{i} + \delta^{2}_{i} \hat{p}_{i}) \ x^{*}_{ij}\ +\ p_{t} + \delta^{2}_{t} \hat{p}_{t} > S$, alors on rajoute l'inégalité $\sum\limits_{i \in V} (p_{i} + \delta^{2}_{i} \hat{p}_{i}) \ x_{ij}\ +\ p_{t} + \delta^{2}_{t} \hat{p}_{t} \leq S$. Si aucune de ces inégalités n'est violée, alors on a trouvé l'optimale pour le problème maître.
 
-\question Résolution par dualisation.
+\newpage
+\question Résolution par dualisation. Voici le problème maître reformulé pour faire apparaître le problème interne lié aux variables $\delta^{1}_{ij}$.
 
 \begin{align*}
 \left(\mathcal{P}_{r}\right) \left\{
@@ -128,7 +129,7 @@ avec $x^{*}$ une solution courante du problème maître. Soient $\delta^{1*}$ et
 %Contraintes du problème maître
 &\text{s.c.}\\
 % Contrainte 1
-& &\sum\limits_{ij \in A} p_{i} \: x_{ij} + \max\limits_{\delta^{2}}\left\{\delta^{2}_{t} \hat{p}_{t} + \sum\limits_{ij \in A} \delta^{2}_{i} \: \hat{p}_{i} \: x_{ij} \right\} &\leq S - p_{t} & (1_{robuste})\\[\interlinespace]
+& &\sum\limits_{ij \in A} p^{2}_{i} x_{ij} \quad + \quad p^{2}_{t} &\leq S \quad \text{$\forall p^{2} \in \mathcal{U}^{2*}$} & (1_{robuste})\\[\interlinespace]
 % Contrainte 2
 & &\sum\limits_{j \in \delta^{+}(i)} x_{ji} \ - \sum\limits_{j \in \delta^{-}(i)} x_{ij} &= 0 \quad \forall i \in V \setminus \{s, t\} & (2_{robuste})\\[\interlinespace]
 % Contrainte 3
