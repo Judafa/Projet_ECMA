@@ -22,11 +22,15 @@
 \begin{align*}
 	\left(\mathcal{P}\right) \left\{
 	\begin{array}{l c c l c c}
-		&\min\limits_{x} &\sum\limits_{(i, j) \in A} d_{ij} \: x_{ij}\\
+		&\min\limits_{x} &\sum\limits_{ij \in A} d_{ij} \: x_{ij}\\
 		&\text{s.c.}\\
-		& &\sum\limits_{(i, j) \in A} p_{i} \: x_{ij} &\leq S - p_{t} & (1) & \text{(limite sur les sommets empruntés)}\\[\interlinespace]
-		& &\sum\limits_{j \in \delta^{+}(i)} x_{ji} \ - \sum\limits_{j \in \delta^{-}(i)} x_{ij} &= 0 \quad \forall i \in A \setminus \{s, t\} & (2) & \text{(conservation du flot)}\\[\interlinespace]
+		% Contrainte 1
+		& &\sum\limits_{ij \in A} p_{i} x_{ij} \quad + \quad p_{t} &\leq S & (1) & \text{(limite sur les sommets empruntés)}\\[\interlinespace]
+		% Contrainte 2
+		& &\sum\limits_{j \in \delta^{+}(i)} x_{ji} \ - \sum\limits_{j \in \delta^{-}(i)} x_{ij} &= 0 \quad \forall i \in V \setminus \{s, t\} & (2) & \text{(conservation du flot)}\\[\interlinespace]
+		% Contrainte 3
 		& &\sum\limits_{j \in \delta^{-}(s)} x_{sj} &= 1 & (3) &  \text{(un seul arc sortant de $s$)}\\[\interlinespace]
+		% Contrainte 4
 		& &\sum\limits_{j \in \delta^{+}(t)} x_{jt} &= 1 & (4) &  \text{(un seul arc rentrant dans $t$)}\\
 	\end{array}
 	\right.
@@ -37,11 +41,15 @@
 \begin{align*}
 	\left(\mathcal{P}_{r}\right) \left\{
 	\begin{array}{l c c l c}
-		&\min\limits_{x} \max\limits_{\delta^{1}} &\sum\limits_{(i, j) \in A} d_{ij} \: (1 + \delta^{1}_{ij}) \: x_{ij}\\
+		&\min\limits_{x} \max\limits_{\delta^{1}} &\sum\limits_{ij \in A} d_{ij} \: (1 + \delta^{1}_{ij}) \: x_{ij}\\
 		&\text{s.c.}\\
-		& &\sum\limits_{(i, j) \in A} p_{i} \: x_{ij} + \max\limits_{\delta^{2}}\left\{\delta^{2}_{t} \hat{p}_{t} + \sum\limits_{(i, j) \in A} \delta^{2}_{i} \: \hat{p}_{i} \: x_{ij} \right\} &\leq S - p_{t} & (1_{robuste})\\[\interlinespace]
-		& &\sum\limits_{j \in \delta^{+}(i)} x_{ji} \ - \sum\limits_{j \in \delta^{-}(i)} x_{ij} &= 0 \quad \forall i \in A \setminus \{s, t\} & (2_{robuste})\\[\interlinespace]
+		% Contrainte 1
+		& &\sum\limits_{ij \in A} p_{i} \: x_{ij} + \max\limits_{\delta^{2}}\left\{\delta^{2}_{t} \hat{p}_{t} + \sum\limits_{ij \in A} \delta^{2}_{i} \: \hat{p}_{i} \: x_{ij} \right\} &\leq S - p_{t} & (1_{robuste})\\[\interlinespace]
+		% Contrainte 2
+		& &\sum\limits_{j \in \delta^{+}(i)} x_{ji} \ - \sum\limits_{j \in \delta^{-}(i)} x_{ij} &= 0 \quad \forall i \in V \setminus \{s, t\} & (2_{robuste})\\[\interlinespace]
+		% Contrainte 3
 		& &\sum\limits_{j \in \delta^{-}(s)} x_{sj} &= 1 & (3_{robuste})\\[\interlinespace]
+		% Contrainte 4
 		& &\sum\limits_{j \in \delta^{+}(t)} x_{jt} &= 1 & (4_{robuste})\\
 	\end{array}
 	\right.
@@ -54,10 +62,15 @@
 \begin{array}{l c c l c}
 &\min\limits_{z} &z\\
 &\text{s.c.}\\
-& &\sum\limits_{(i, j) \in A} d^{1}_{ij} \: x_{ij} &\leq z  \quad \text{$\forall d^{1} \in \mathcal{U}^{1*}$} & (0)\\[\interlinespace]
-& &\sum\limits_{(i, j) \in A} p^{2}_{i} \: x_{ij} &\leq S - p^{2}_{t} \quad \text{$\forall p^{2} \in \mathcal{U}^{2*}$} & (1_{robuste})\\[\interlinespace]
-& &\sum\limits_{j \in \delta^{+}(i)} x_{ji} \ - \sum\limits_{j \in \delta^{-}(i)} x_{ij} &= 0 \quad \forall i \in A \setminus \{s, t\} & (2_{robuste})\\
+% Contrainte 0
+& &\sum\limits_{ij \in A} d^{1}_{ij} \: x_{ij} &\leq z  \quad \text{$\forall d^{1} \in \mathcal{U}^{1*}$} & (0)\\[\interlinespace]
+% Contrainte 1
+& &\sum\limits_{ij \in A} p^{2}_{i} x_{ij} \quad + \quad p^{2}_{t} &\leq S \quad \text{$\forall p^{2} \in \mathcal{U}^{2*}$} & (1_{robuste})\\[\interlinespace]
+% Contrainte 2
+& &\sum\limits_{j \in \delta^{+}(i)} x_{ji} \ - \sum\limits_{j \in \delta^{-}(i)} x_{ij} &= 0 \quad \forall i \in V \setminus \{s, t\} & (2_{robuste})\\[\interlinespace]
+% Contrainte 3
 & &\sum\limits_{j \in \delta^{-}(s)} x_{sj} &= 1 & (3_{robuste})\\[\interlinespace]
+% Contrainte 4
 & &\sum\limits_{j \in \delta^{+}(t)} x_{jt} &= 1 & (4_{robuste})\\
 \end{array}
 \right.
@@ -71,12 +84,18 @@ Il y a deux sous problèmes à résoudre, $(SP_{0})$ et $(SP_{1})$:
 \begin{align*}
 &\left(SP_{0}\right) \left\{
 \begin{array}{ll}
- \max\limits_{\delta^{1}} \sum\limits_{(i, j) \in A} p^{0}_{ij} \: x^{*}_{ij}
+ \max\limits_{\delta^{1}} &\sum\limits_{ij \in A} d_{ij} \ (1 + \delta^{1}_{ij}) \ x^{*}_{ij}\\
+ \text{s.c}\\
+ &\sum\limits_{ij \in A} \delta^{1}_{ij} \leq d_{1} \quad \forall ij \in A\\[\interlinespace]
+ &\delta^{1}_{ij} \leq D_{ij} \quad \forall ij \in A
  \end{array}
  \right.
 &&\left(SP_{1}\right) \left\{
-\begin{array}{ll}
-\max\limits_{p^{1} \, \in \, \mathcal{U}^{1*}} \sum\limits_{(i, j) \in A} p^{1}_{ij} \: x^{*}_{ij}
+\begin{array}{l l}
+ \max\limits_{\delta^{2}} &\sum\limits_{i \in V} (p_{i} + \delta^{2}_{i} \hat{p}_{i}) \ x^{*}_{ij} \quad + \quad p_{t} + \delta^{2}_{t} \hat{p}_{t}\\
+\text{s.c}\\
+&\sum\limits_{i \in V} \delta^{2}_{i} \leq d_{2} \quad \forall i \in V\\[\interlinespace]
+&\delta^{2}_{i} \leq 2 \quad \forall i \in V
 \end{array}
 \right.
 \end{align*}
