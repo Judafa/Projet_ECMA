@@ -4,6 +4,7 @@
 \usepackage{amsmath, amssymb, bm}
 \usepackage{wasysym, bigints}
 \usepackage{graphicx}
+\usepackage{makecell}
 
 % Langue
 \usepackage[french]{babel}
@@ -96,8 +97,7 @@ Il y a deux sous problèmes à résoudre, $(SP_{0})$ et $(SP_{1})$:
 \text{s.c}\\
 &\sum\limits_{i \in V} \delta^{2}_{i} \leq d_{2}\\[\interlinespace]
 &\delta^{2}_{i} \leq 2 \quad \forall i \in V
-\end{array}
-\right.
+\end{array} \right.
 \end{align*}
 
 avec $x^{*}$ une solution courante du problème maître. Soient $\delta^{1*}$ et $\delta^{2*}$ des solutions optimales de $\left(SP_{0}\right)$ et $\left(SP_{1}\right)$, soit $z^{*}$ une solution optimale du problème maître courant. Cette solution du problème maître courant est l'optimale, ssi 
@@ -110,7 +110,33 @@ avec $x^{*}$ une solution courante du problème maître. Soient $\delta^{1*}$ et
 \end{array}
 \end{align*}
 
-À chaque itération, on ajoute les contraintes suivantes. Si $\sum\limits_{ij \in A} d_{ij} \ (1 + \delta^{1}_{ij}) \ x^{*}_{ij} > z^{*}$, alors on rajoute l'inégalité $\sum\limits_{ij \in A} d_{ij} \ (1 + \delta^{1}_{ij}) \ x^{*}_{ij} \leq z^{*}$. Si $\sum\limits_{i \in V} (p_{i} + \delta^{2}_{i} \hat{p}_{i}) \ x^{*}_{ij}\ +\ p_{t} + \delta^{2}_{t} \hat{p}_{t} > S$, alors on rajoute l'inégalité $\sum\limits_{i \in V} (p_{i} + \delta^{2}_{i} \hat{p}_{i}) \ x^{*}_{ij}\ +\ p_{t} + \delta^{2}_{t} \hat{p}_{t} \leq S$. Si aucune de ces inégalités n'est violée, alors on a trouvé l'optimale pour le problème maître.
+À chaque itération, on ajoute les contraintes suivantes. Si $\sum\limits_{ij \in A} d_{ij} \ (1 + \delta^{1}_{ij}) \ x^{*}_{ij} > z^{*}$, alors on coupe cette mauvaise solution $x^{*}$ en rajoutant l'inégalité $\sum\limits_{ij \in A} d_{ij} \ (1 + \delta^{1}_{ij}) \ x_{ij} \leq z^{*}$. De même si $\sum\limits_{i \in V} (p_{i} + \delta^{2}_{i} \hat{p}_{i}) \ x^{*}_{ij}\ +\ p_{t} + \delta^{2}_{t} \hat{p}_{t} > S$, alors on rajoute l'inégalité $\sum\limits_{i \in V} (p_{i} + \delta^{2}_{i} \hat{p}_{i}) \ x_{ij}\ +\ p_{t} + \delta^{2}_{t} \hat{p}_{t} \leq S$. Si aucune de ces inégalités n'est violée, alors on a trouvé l'optimale pour le problème maître.
+
+\question Résolution par dualisation.
+
+\begin{align*}
+\left(\mathcal{P}_{r}\right) \left\{
+\begin{array}{l c c l c}
+&\min\limits_{x} \: d_{ij} \: x_{ij} &+ \qquad \quad
+%Deuxième problème
+\left\{ \makecell[c]{ \begin{array}{l l}
+	\max\limits_{\delta^{1}} &\sum\limits_{ij \in A} d_{ij} \ (1 + \delta^{1}_{ij}) \ x^{*}_{ij}\\
+	\text{s.c}\\
+	&\sum\limits_{ij \in A} \delta^{1}_{ij} \leq d_{1}\\[\interlinespace]
+	&\delta^{1}_{ij} \leq D_{ij} \quad \forall ij \in A
+	\end{array}} \right.\\
+%Contraintes du problème maître
+&\text{s.c.}\\
+% Contrainte 1
+& &\sum\limits_{ij \in A} p_{i} \: x_{ij} + \max\limits_{\delta^{2}}\left\{\delta^{2}_{t} \hat{p}_{t} + \sum\limits_{ij \in A} \delta^{2}_{i} \: \hat{p}_{i} \: x_{ij} \right\} &\leq S - p_{t} & (1_{robuste})\\[\interlinespace]
+% Contrainte 2
+& &\sum\limits_{j \in \delta^{+}(i)} x_{ji} \ - \sum\limits_{j \in \delta^{-}(i)} x_{ij} &= 0 \quad \forall i \in V \setminus \{s, t\} & (2_{robuste})\\[\interlinespace]
+% Contrainte 3
+& &\sum\limits_{j \in \delta^{-}(s)} x_{sj} &= 1 & (3_{robuste})\\[\interlinespace]
+% Contrainte 4
+& &\sum\limits_{j \in \delta^{+}(t)} x_{jt} &= 1 & (4_{robuste})\\
+\end{array} \right.
+\end{align*}
 
 \end{questions}
 
