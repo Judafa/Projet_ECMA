@@ -19,6 +19,8 @@
 \begin{document}
 \maketitle
 
+Dans la suite du document, la variable $x_{ij}$ désigne la sélection de l'arc $ij \in A$ dans le chemin de $s$ à $t$.
+
 \begin{questions}
 \question Voici le problème statique $\left(\mathcal{P}\right)$:
 \begin{align*}
@@ -79,8 +81,7 @@
 \right.
 \end{align*}
 
-(Je sais pas encore quels ensembles $\mathcal{U}^{1*}$ et $\mathcal{U}^{2*}$ choisir au début, deux sous ensembles aléatoires et petits de $\mathcal{U}^{1}$ et $\mathcal{U}^{2}$ ?)\\
-
+Au début de l'algorithme de plans coupants, on peut choisir les ensembles de départ $\mathcal{U}^{1*}$ et $\mathcal{U}^{2*}$ suivants:
 \begin{align*}
     \mathcal{U}^{1*} &= \left\{ \left\{ d^1_{ij} = d_{ij} \right\}_{ij \in A} \right\} \\
     \mathcal{U}^{2*} &= \left\{ \left\{ p^1_{i} = d_{i} \right\}_{i \in V} \right\} \\
@@ -148,39 +149,36 @@ avec $x^{*}$ une solution courante du problème maître. Soient $\delta^{1*}$ et
 Isolation dans le problème robuste du terme faisant intervenir les variables $\delta^1_{ij}$ :
 
 \begin{align*}
-\min\limits_x \max\limits_{d^1} \sum\limits_{ij \in A} d_{ij}^1 \, x_{ij} = & \min\limits_x \max\limits_{delta^1}\sum\limits_{ij \in A} d_{ij} \ (1 + \delta^{1}_{ij}) \ x_{ij}\\
-& \min\limits_x \left(\sum\limits_{ij \in A} d_{ij} \, x_{ij} + \max\limits_{\delta^1}\sum\limits_{ij \in A} d_{ij} \, \delta^{1}_{ij} \, x_{ij} \right)\\
+\min\limits_x \max\limits_{d^1} \sum\limits_{ij \in A} d_{ij}^1 \, x_{ij} &= \min\limits_x \max\limits_{\delta^1}\sum\limits_{ij \in A} d_{ij} \ (1 + \delta^{1}_{ij}) \ x_{ij}\\
+&= \min\limits_x \left(\sum\limits_{ij \in A} d_{ij} \, x_{ij} + \max\limits_{\delta^1}\sum\limits_{ij \in A} d_{ij} \, \delta^{1}_{ij} \, x_{ij} \right)\\
 \end{align*}
 
 Problème interne lié aux variables $\delta^1_{ij}$ :
 
 \begin{align*}
 \left\{
-\begin{array}{l l l}
-&\max\limits_{\delta^1} \: &\sum\limits_{ij \in A} d_{ij} \, \delta^{1}_{ij} \, x_{ij} \\[\interlinespace]
+\begin{array}{l l l c}
+&\max\limits_{\delta^1} \: &\sum\limits_{ij \in A} d_{ij} \, \delta^{1}_{ij} \, x_{ij} \\
 %Contraintes
-&\text{s.c.}\\[\interlinespace]
+&\text{s.c.}\\
 % Contrainte 1
-& &\sum\limits_{ij \in A} \delta^1_{ij} \leq d_1\\[\interlinespace]
+& &\sum\limits_{ij \in A} \delta^1_{ij} \leq d_1 \quad &(\alpha^{1})\\[\interlinespace]
 % Contrainte 2
-& &\delta^1_{ij} \in \left[0, D_{ij}\right] \quad \forall ij \in A\\[\interlinespace]
+& &\delta^1_{ij} \leq D_{ij} \quad \forall ij \in A \quad &(\beta^{1}_{ij})
 \end{array} \right.
 \end{align*}
 
 
-On dualise ce problème : 
-Je ne suis pas sûr du tout de la dualisation, je pense même qu'elle est fausse...
+On dualise ce problème :
 
 \begin{align*}
 \left\{
-\begin{array}{l l l}
-&\min\limits_{\alpha} \: & d_1 \, \alpha \\[\interlinespace]
+\begin{array}{l l l l}
+&\min\limits_{\alpha^{1}, \beta^{1}} \: & d_{1} \alpha^{1} + \sum\limits_{ij \in A} D_{ij} \beta^{1}_{ij} \\
 %Contraintes
-&\text{s.c.}\\[\interlinespace]
+&\text{s.c.}\\
 % Contrainte 1
-& &\alpha \sum\limits_{ij \in A} \delta^1_{ij} \geq \sum\limits_{ij \in A} d_{ij} \, \delta^1_{ij}\\[\interlinespace]
-% Contrainte 2
-& &\alpha \geq 0  \qquad\text{Que devient l'intervalle $[O, D_{ij}]$ ??}\\[\interlinespace]
+& & \alpha^{1} + \beta^{1}_{ij} \geq d_{ij} x_{ij}  \quad \forall ij \in A &(\delta_{ij})
 \end{array} \right.
 \end{align*}
 
@@ -188,26 +186,90 @@ Reformulation de la contrainte robuste afin d'isoler le terme faisant intervenir
 
 \begin{align*}
 &\sum\limits_{ij \in A} p^2_i \, x_{ij} + p^2_t \leq S \qquad p^2_i \in \mathcal{U}^2\\
+&\text{qui se décompose en}\\
 &\sum\limits_{ij \in A} \left( p_i + \delta^2_i \, \hat{p}_i \right) x_{ij} + p_t + \delta^2_t \, \hat{p}_t \leq S \\
+&\text{et après passage au maximum par rapport à $\delta^{2}$}\\
 &\sum\limits_{ij \in A}  p_i \, x_{ij} + \max\limits_{\delta^2} \left( \sum\limits_{ij \in A} \delta^2_i \hat{p}_i x_{ij} + \delta^2_t \hat{p}_t \right) \leq S \\
 \end{align*}
+
 
 Le problème interne lié aux variables $\delta^1_{ij}$ :
 
 \begin{align*}
 \left\{
-\begin{array}{l l l}
-&\max\limits_{\delta^2} & \left( \sum\limits_{ij \in A} \delta^2_i \hat{p}_i x_{ij} + \delta^2_t \hat{p}_t \right) \\[\interlinespace]
+\begin{array}{l l l c}
+&\max\limits_{\delta^2} & \left( \sum\limits_{ij \in A} \delta^2_i \: \hat{p}_i \: x_{ij} + \delta^2_t \: \hat{p}_t \right) \\
 %Contraintes
-&\text{s.c.}\\[\interlinespace]
+&\text{s.c.}\\
 % Contrainte 1
-& &\sum\limits_{i \in V} \delta^2_{i} \leq d_2\\[\interlinespace]
+& &\sum\limits_{i \in V} \delta^2_{i} \leq d_2 &(\alpha^{2})\\[\interlinespace]
 % Contrainte 2
-& &\delta^2_{i} \in \left[0, 2\right] \quad \forall i \in V\\[\interlinespace]
+& &\delta^2_{i} \leq 2 \quad \forall i \in V &(\beta^{2}_{i})
 \end{array} \right.
 \end{align*}
 
 Il faut le dualiser puis utiliser les deux dualisations pour présenter les problème robuste sous la forme d'un simple programme linéaire en nombre entiers.
+
+
+\begin{align*}
+\left\{
+\begin{array}{l l l c}
+&\min\limits_{\alpha^{2}, \beta^{2}} &d_{2} \alpha^{2} + \sum\limits_{i \in V} 2 \beta^{2}_{i}\\
+%Contraintes
+&\text{s.c.}\\
+% Contrainte 1
+& &\alpha^{2} + \beta^{2}_{i} \geq \hat{p}_{i} \: x_{ij} \quad \forall i \in V \setminus \{t\} &(\delta^{2}_{i})\\[\interlinespace]
+% Contrainte 2
+& &\alpha^{2} + \beta^{2}_{t} \geq \hat{p}_{i} &(\delta^{2}_{t})\\
+\end{array} \right.
+\end{align*}
+
+On reformule le problème maître:
+
+\begin{align*}
+\left(\mathcal{P}_{r}\right) \left\{
+\begin{array}{l c c l c}
+&\min\limits_{x, \alpha^{1}, \beta^{1}} \: &d_{ij} \: x_{ij} + d_{1} \alpha^{1} + \sum\limits_{ij \in A} D_{ij} \beta^{1}_{ij} \\
+%Contraintes du problème maître
+&\text{s.c.}\\
+% Contrainte 1
+& &\sum\limits_{ij \in A} p_{i} \: x_{ij} + \min\limits_{\alpha^{2}, \beta^{2}} \left(d_{2} \alpha^{2} + \sum\limits_{i \in V} 2 \beta^{2}_{i}\right) &\leq S - p_{t} & (1_{robuste})\\[\interlinespace]
+% Contrainte duale 
+& &\alpha^{2} + \beta^{2}_{i} &\geq \hat{p}_{i} \: x_{ij} \quad \forall i \in V \setminus \{t\} &(\delta^{2}_{i})\\[\interlinespace]
+& &\alpha^{2} + \beta^{2}_{t} &\geq \hat{p}_{i} &(\delta^{2}_{t})\\[\interlinespace]
+% Contrainte 2
+& &\sum\limits_{j \in \delta^{+}(i)} x_{ji} \ - \sum\limits_{j \in \delta^{-}(i)} x_{ij} &= 0 \quad \forall i \in V \setminus \{s, t\} & (2_{robuste})\\[\interlinespace]
+% Contrainte 3
+& &\sum\limits_{j \in \delta^{-}(s)} x_{sj} &= 1 & (3_{robuste})\\[\interlinespace]
+% Contrainte 4
+& &\sum\limits_{j \in \delta^{+}(t)} x_{jt} &= 1 & (4_{robuste})\\[\interlinespace]
+& & \alpha^{1} + \beta^{1}_{ij} &\geq d_{ij} x_{ij}  \quad \forall ij \in A &(\delta_{ij})
+\end{array} \right.
+\end{align*}
+~\\ \\
+puis on peut supprimer le min dans la contrainte $(1_{robuste})$:\\
+
+\begin{align*}
+\left(\mathcal{P}_{r}\right) \left\{
+\begin{array}{l c c l c}
+&\min\limits_{x, \alpha^{1}, \beta^{1}} \: &d_{ij} \: x_{ij} + d_{1} \alpha^{1} + \sum\limits_{ij \in A} D_{ij} \beta^{1}_{ij} \\
+%Contraintes du problème maître
+&\text{s.c.}\\
+% Contrainte 1
+& &\sum\limits_{ij \in A} p_{i} \: x_{ij} + d_{2} \alpha^{2} + \sum\limits_{i \in V} 2 \beta^{2}_{i} &\leq S - p_{t} & (1_{robuste})\\[\interlinespace]
+% Contrainte duale 
+& &\alpha^{2} + \beta^{2}_{i} &\geq \hat{p}_{i} \: x_{ij} \quad \forall i \in V \setminus \{t\} &(\delta^{2}_{i})\\[\interlinespace]
+& &\alpha^{2} + \beta^{2}_{t} &\geq \hat{p}_{i} &(\delta^{2}_{t})\\[\interlinespace]
+% Contrainte 2
+& &\sum\limits_{j \in \delta^{+}(i)} x_{ji} \ - \sum\limits_{j \in \delta^{-}(i)} x_{ij} &= 0 \quad \forall i \in V \setminus \{s, t\} & (2_{robuste})\\[\interlinespace]
+% Contrainte 3
+& &\sum\limits_{j \in \delta^{-}(s)} x_{sj} &= 1 & (3_{robuste})\\[\interlinespace]
+% Contrainte 4
+& &\sum\limits_{j \in \delta^{+}(t)} x_{jt} &= 1 & (4_{robuste})\\[\interlinespace]
+& & \alpha^{1} + \beta^{1}_{ij} &\geq d_{ij} x_{ij}  \quad \forall ij \in A &(\delta_{ij})
+\end{array} \right.
+\end{align*}
+
 
 
 \end{questions}
