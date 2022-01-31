@@ -2,3 +2,6 @@ Raport/Modelisation_Papier.aux
 Raport/Modelisation_Papier.log
 Raport/Modelisation_Papier.synctex.gz
 Instances_ECMA.zip
+*.aux
+*.log
+*.synctex.gz
