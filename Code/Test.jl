@@ -46,8 +46,8 @@ m = Model(CPLEX.Optimizer)
 
 optimize!(m)
 # print(m)
-print(value.(x))
-print(objective_value(m))
+print("sommets du chemin : ", value.(y), "\n")
+print("valeur de l'objectif : ", objective_value(m))
 
 
 # n = 6
