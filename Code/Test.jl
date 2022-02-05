@@ -4,7 +4,7 @@ using CPLEX
 include("Fonctions_Init.jl")
 
 # ------------------------------------------------------------- Lit le modèle
-# n, s, t, S, d1, d2, p, ph, Mat = read_data("Instances_ECMA/20_USA-road-d.NY.gr")
+# n, s, t, S, d1, d2, p, ph, Mat = read_data_include("Instances_ECMA/20_USA-road-d.NY.gr")
 n, s, t, S, d1, d2, p, ph, Mat = read_data("Instances_ECMA/100_USA-road-d.BAY.gr")
 
 
