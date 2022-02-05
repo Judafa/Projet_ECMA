@@ -18,18 +18,29 @@ function read_data(path)
         data = readlines(myFile)
 
         # Pour chaque ligne du fichier
-        
         for i in 1:8
             # Afficher la ligne
             eval(Meta.parse(data[i]))
         end
 
         # Pour la matrice Mat
-        string_mat = ""
-        for i in 9:size(data)[1]
-            string_mat = string_mat * data[i]
+        Mat = zeros(size(data)[1] - 10, 4)
+        mat_lines = data[10:size(data)[1]-1]
+
+        compteur = 1
+        for line in mat_lines
+            # Enlève les ; et ]
+            line = replace(line,";" => "" )
+            line = replace(line,"]" => "" )
+            # sépare la ligne par coefficients
+            coeffs = split(line, " ")
+            Mat[compteur, 1] = tryparse(Int64, coeffs[1])
+            Mat[compteur, 2] = tryparse(Int64, coeffs[2])
+            Mat[compteur, 3] = tryparse(Int64, coeffs[3])
+            Mat[compteur, 4] = tryparse(Float64, coeffs[4])
+
+            compteur += 1
             end
-        eval(Meta.parse(string_mat))
         # Fermer le fichier
         close(myFile)
     end
