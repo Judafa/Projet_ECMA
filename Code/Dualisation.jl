@@ -4,11 +4,8 @@ include("Fonctions_Init.jl")
 
 # fichier à utiliser
 
-<<<<<<< Updated upstream:Code/Dualisation.jl
-filename = "20_USA-road-d.NY.gr"
-=======
+
 filename = "500_USA-road-d.BAY.gr"
->>>>>>> Stashed changes:Code/dualisation.jl
 path = string("./Code/Instances_ECMA/", filename)
 
 

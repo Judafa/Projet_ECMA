@@ -4,10 +4,8 @@ using CPLEX
 
 include("Fonctions_Init.jl")
 include("Heuristique.jl")
-path = "Code/Instances_ECMA/400_USA-road-d.BAY.gr"
 
 # ------------------------------------------------------------- Lit le modèle
-n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
 
 function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, utilise_heuristique_SP1 = false, utilise_heuristique_SP2=true)
 
@@ -180,11 +178,15 @@ function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, utilise_h
     MOI.set(m, CPLEX.CallbackFunction(), my_cb_function)
     optimize!(m)
 
-
-    # print("sommets du chemin : ", value.(y), "\n")
-    print("valeur de l'objectif Branch&Cut: ", objective_value(m))
+    obj_value = JuMP.objective_value(m)
+    return obj_value
 end
 
-branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat)
+path = "Code/Instances_ECMA/1000_USA-road-d.BAY.gr"
+n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
+
+
+obj_value = branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, utilise_heuristique_SP1=false)
+print("valeur de l'objectif Branch&Cut : $obj_value")
 
 # @benchmark branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat)
