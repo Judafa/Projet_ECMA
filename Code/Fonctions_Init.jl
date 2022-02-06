@@ -10,8 +10,9 @@ end
 
 
 function read_data(path)
-
+    println("Attempting to find file.")
     if isfile(path)
+        println("File found, loading.")
         # L’ouvrir
         myFile = open(path)
         # Lire toutes les lignes d’un fichier
@@ -44,7 +45,6 @@ function read_data(path)
         # Fermer le fichier
         close(myFile)
     end
-
     return n, s, t, S, d1, d2, p, ph, Mat
 end
 

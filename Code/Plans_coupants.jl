@@ -4,7 +4,9 @@ include("Fonctions_Init.jl")
 
 # fichier à utiliser
 filename = "20_USA-road-d.NY.gr"
-path = string("./Instances_ECMA/", filename)
+path = string("./Code/Instances_ECMA/", filename)
+
+println("Résolution par plans coupants.")
 
 
 # lecture et acquisition des données avec la fonction de Fonctions_Init
@@ -33,12 +35,6 @@ n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
 # println("ph = $ph")
 # println("Mat = $Mat")
 
-nb_arcs = size(Mat)[1]
-durees = Mat[:,3]
-D = Mat[:,4]
-
-
-
 
 
 function generate_sub_problems(n, nb_arcs, durees, D, d1, d2, p, ph, x_star, y_star)
@@ -63,7 +59,10 @@ function generate_sub_problems(n, nb_arcs, durees, D, d1, d2, p, ph, x_star, y_s
 end
 
 
-function plans_coupants(n, nb_arcs, durees, D, d1, d2, p, ph)
+function plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
+    nb_arcs = size(Mat)[1]
+    durees = Mat[:,3]
+    D = Mat[:,4]
     # Définition du modèle pour le problème principal
     MP = Model(CPLEX.Optimizer)
     # variables
@@ -118,7 +117,7 @@ end
 
 
 
-z_star = plans_coupants(n, nb_arcs, durees, D, d1, d2, p, ph)
+z_star = plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
 
 println("Objective value: ", z_star)
 
