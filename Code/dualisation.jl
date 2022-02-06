@@ -3,10 +3,9 @@ using JuMP, CPLEX, BenchmarkTools
 include("Fonctions_Init.jl")
 
 # fichier à utiliser
+
 filename = "20_USA-road-d.BAY.gr"
 path = string("./Code/Instances_ECMA/", filename)
-
-println("Résolution par dualisation.")
 
 
 # lecture et acquisition des données avec la fonction de Fonctions_Init

@@ -4,7 +4,7 @@ using CPLEX
 
 include("Fonctions_Init.jl")
 include("Heuristique.jl")
-path = "Instances_ECMA/400_USA-road-d.BAY.gr"
+path = "Code/Instances_ECMA/400_USA-road-d.BAY.gr"
 
 # ------------------------------------------------------------- Lit le modèle
 n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
@@ -94,6 +94,11 @@ for a in Aretes
     delta1_glouton[a] = 0
 end
 
+delta2_glouton = Dict()
+for v in Sommets
+    delta2_glouton[v] = 0
+end
+
 # ---------------------------------------------------------- Fonction callback
 function my_cb_function(cb_data::CPLEX.CallbackContext, context_id::Clong)
 
@@ -111,126 +116,38 @@ function my_cb_function(cb_data::CPLEX.CallbackContext, context_id::Clong)
         z_val = callback_value(cb_data, z)
         
         # --------------------- Heuristique Gloutonne pour SP1
-        traffic_aloue = 0
-        aretes_alourdies = []
-        trouve_augmentation = true
 
-        ajout_traffic = 0
+        # Résout sous problème SP1
+        @objective(SP1, Max, sum(d[a] * (1 + delta1[a]) * x_val[a] for a in Aretes))
+        optimize!(SP1)
+        z1 = objective_value(SP1)
+        delta1_val = value.(delta1)
 
-        while traffic_aloue < d1 && trouve_augmentation
-            coeff_max = -Inf64
-            a_max = [-1, -1]
-            for a in Aretes
-                # if x_val[a] == 1 && coeff_max < min(d1 - traffic_aloue, D[a]) * d[a] && a ∉ aretes_alourdies
-                #     coeff_max = min(d1 - traffic_aloue, D[a]) 
-                #     a_max = a
-                # end
-                if x_val[a] == 1 && coeff_max < D[a] * d[a] && a ∉ aretes_alourdies
-                    coeff_max = D[a] * d[a]
-                    ajout_traffic = min(d1 - traffic_aloue, D[a])
-                    a_max = a
-                end
-            end
-            if a_max == [-1, -1]
-                trouve_augmentation = false
-            else
-                traffic_aloue += ajout_traffic
-                push!(aretes_alourdies, a_max)
-                delta1_glouton[a_max] = ajout_traffic
-            end
-        end
-
-        for a in Aretes
-            if a ∉ aretes_alourdies
-                delta1_glouton[a] = 0
-            end
-        end
-        
-        z1_glouton = sum(d[a] * (1 + delta1_glouton[a]) * x_val[a] for a in Aretes)
-
-        if z1_glouton > z_val 
-            # Ajoute solution gloutonne
-            cons1 = @build_constraint(sum(d[a] * (1 + delta1_glouton[a]) * x[a] for a in Aretes) <= z)
+        # Ajoute la contrainte de SP1
+        if z1 > z_val 
+            cons1 = @build_constraint(sum(d[a] * (1 + delta1_val[a]) * x[a] for a in Aretes) <= z)
             MOI.submit(m, MOI.LazyConstraint(cb_data), cons1)
-        # else
-        #     # Résout sous problème SP1
-        #     @objective(SP1, Max, sum(d[a] * (1 + delta1[a]) * x_val[a] for a in Aretes))
-        #     optimize!(SP1)
-        #     z1 = objective_value(SP1)
-        #     delta1_val = value.(delta1)
-
-        #     # Ajoute la contrainte de SP1
-        #     if z1 > z_val 
-        #         cons1 = @build_constraint(sum(d[a] * (1 + delta1_val[a]) * x[a] for a in Aretes) <= z)
-        #         MOI.submit(m, MOI.LazyConstraint(cb_data), cons1)
-        #     end
         end
-
-        # # Résout sous problème SP1
-        # @objective(SP1, Max, sum(d[a] * (1 + delta1[a]) * x_val[a] for a in Aretes))
-        # optimize!(SP1)
-        # z1 = objective_value(SP1)
-        # delta1_val = value.(delta1)
-
-        # # Ajoute la contrainte de SP1
-        # if z1 > z_val 
-        #     cons1 = @build_constraint(sum(d[a] * (1 + delta1_val[a]) * x[a] for a in Aretes) <= z)
-        #     MOI.submit(m, MOI.LazyConstraint(cb_data), cons1)
-        # end
 
         # --------------------- Heuristique Gloutonne pour SP2
-        poids_aloue = 0
-        sommets_alourdis = []
-        trouve_augmentation = true
+        z2_glouton, delta2_glouton = heuristique_SP2(p, ph, d2, Sommets, y_val)
 
-        ajout_poids = 0
-
-        while poids_aloue < d2 && trouve_augmentation
-            coeff_max = -Inf64
-            v_max = -1
-            for v in Sommets
-                # if x_val[a] == 1 && coeff_max < min(d1 - traffic_aloue, D[a]) * d[a] && a ∉ sommets_alourdis
-                #     coeff_max = min(d1 - traffic_aloue, D[a]) 
-                #     v_max = a
-                # end
-                if y_val[v] == 1 && coeff_max < p[v] && v ∉ sommets_alourdis
-                    coeff_max = D[a] * d[a]
-                    ajout_poids = min(d1 - poids_aloue, D[a])
-                    v_max = a
-                end
-            end
-            if v_max == [-1, -1]
-                trouve_augmentation = false
-            else
-                poids_aloue += ajout_poids
-                push!(sommets_alourdis, v_max)
-                delta1_glouton[v_max] = ajout_poids
-            end
-        end
-
-        for a in Aretes
-            if a ∉ sommets_alourdis
-                delta1_glouton[a] = 0
-            end
-        end
-        
-        z1_glouton = sum(d[a] * (1 + delta1_glouton[a]) * x_val[a] for a in Aretes)
-
-        if z1_glouton > z_val 
+        if z2_glouton > S
             # Ajoute solution gloutonne
-            cons1 = @build_constraint(sum(d[a] * (1 + delta1_glouton[a]) * x[a] for a in Aretes) <= z)
-            MOI.submit(m, MOI.LazyConstraint(cb_data), cons1)
-
-        # Résout le sous problème SP2
-        @objective(SP2, Max, sum((p[v] + delta2[v] * ph[v]) * y_val[v] for v in Sommets))
-        optimize!(SP2)
-        z2 = objective_value(SP2)
-        delta2_val = value.(delta2)
-
-        if z2 > S
-            cons2 = @build_constraint(sum((p[v] + delta2_val[v] * ph[v]) * y[v] for v in Sommets) <= S)
+            cons2 = @build_constraint(sum((p[v] + delta2_glouton[v] * ph[v]) * y[v] for v in Sommets) <= S)
             MOI.submit(m, MOI.LazyConstraint(cb_data), cons2)
         end
+
+        # # Résout le sous problème SP2
+        # @objective(SP2, Max, sum((p[v] + delta2[v] * ph[v]) * y_val[v] for v in Sommets))
+        # optimize!(SP2)
+        # z2 = objective_value(SP2)
+        # delta2_val = value.(delta2)
+
+        # if z2 > S
+        #     cons2 = @build_constraint(sum((p[v] + delta2_val[v] * ph[v]) * y[v] for v in Sommets) <= S)
+        #     MOI.submit(m, MOI.LazyConstraint(cb_data), cons2)
+        # end
     end
 end
 
