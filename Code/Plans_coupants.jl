@@ -37,14 +37,20 @@ n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
 
 
 
-function generate_sub_problems(n, nb_arcs, durees, D, d1, d2, p, ph, x_star, y_star)
+function generate_sub_problems(n, nb_arcs, durees, D, d1, d2, p, ph, x_star, y_star; verbose=false)
     SP1 = Model(CPLEX.Optimizer)    # sous-problème lié à U1
+    if verbose == false
+        set_silent(SP1)
+    end
     @variable(SP1, 0 <= delta1[a = 1:nb_arcs] <= D[a])
     @constraint(SP1, sum(delta1[a] for a in 1:nb_arcs) <= d1)
     @objective(SP1, Max, sum(durees[a]*(1 + delta1[a])*x_star[a] for a in 1:nb_arcs))
     JuMP.optimize!(SP1)
 
     SP2 = Model(CPLEX.Optimizer)    # sous-problème lié à U2
+    if verbose == false
+        set_silent(SP2)
+    end
     @variable(SP2, 0 <= delta2[1:n] <= 2)
     @constraint(SP2, sum(delta2[v] for v in 1:n) <= d2)
     @objective(SP2, Max, sum((p[v] + delta2[v]*ph[v])*y_star[v] for v in 1:n))
@@ -59,12 +65,15 @@ function generate_sub_problems(n, nb_arcs, durees, D, d1, d2, p, ph, x_star, y_s
 end
 
 
-function plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
+function plans_coupants(n, s, t, S, d1, d2, p, ph, Mat; verbose=false)
     nb_arcs = size(Mat)[1]
     durees = Mat[:,3]
     D = Mat[:,4]
     # Définition du modèle pour le problème principal
     MP = Model(CPLEX.Optimizer)
+    if verbose == false
+        set_silent(MP)
+    end
     # variables
     @variable(MP, z >= 0)
     @variable(MP, x[1:nb_arcs], Bin)
@@ -116,23 +125,8 @@ function plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
 end
 
 
+@benchmark plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
 
-z_star = plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
-
-println("Objective value: ", z_star)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# z_star = plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
+# println("Objective value: ", z_star)
 

@@ -1,4 +1,4 @@
-using JuMP, CPLEX
+using JuMP, CPLEX, BenchmarkTools
 
 include("Fonctions_Init.jl")
 
@@ -37,13 +37,17 @@ n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
 
 
 
-function dualisation(n, s, t, S, d1, d2, p, ph, Mat)
+function dualisation(n, s, t, S, d1, d2, p, ph, Mat; verbose=false)
     nb_arcs = size(Mat)[1]
     durees = Mat[:,3]
     D = Mat[:,4]
     
     # Définition du modèle
     model = Model(CPLEX.Optimizer)
+
+    if verbose == false
+        set_silent(model)
+    end
     
     # variables
     @variable(model, x[1:nb_arcs], Bin)
@@ -86,8 +90,9 @@ function dualisation(n, s, t, S, d1, d2, p, ph, Mat)
     return obj_value
 end
 
-obj_value = dualisation(n, s, t, S, d1, d2, p, ph, Mat)
-println("Objective value: ", obj_value)
 
-# println(JuMP.value(x))
-# println(JuMP.value(y))
+@benchmark dualisation(n, s, t, S, d1, d2, p, ph, Mat)
+
+# obj_value = dualisation(n, s, t, S, d1, d2, p, ph, Mat)
+# println("Objective value: ", obj_value)
+
