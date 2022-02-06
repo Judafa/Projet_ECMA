@@ -114,7 +114,7 @@ function my_callback_function(cb_data, z_star)
         println("Adding $(con)")
         MOI.submit(model, MOI.LazyConstraint(cb_data), con)
     elseif z2 > S
-        con = @build_constraint(sum(y[v]*(p[v] + delta2_star[v]*ph[v])) <= S)
+        con = @build_constraint(sum(y[v]*(p[v] + delta2_star[v]*ph[v]) for v in 1:n) <= S)
         println("Adding $(con)")
         MOI.submit(model, MOI.LazyConstraint(cb_data), con)
     end
