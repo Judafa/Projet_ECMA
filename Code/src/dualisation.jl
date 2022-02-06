@@ -9,7 +9,7 @@ function read_data(path)
 end
 
 # lecture et acquisition des données
-n, s, t, S, d1, d2, p, ph, Mat = read_data("20_USA-road-d.BAY.gr")
+n, s, t, S, d1, d2, p, ph, Mat = read_data("../Instances_ECMA/20_USA-road-d.NY.gr")
 
 ######################### DONNEES #########################
 # n : nombre de sommets
