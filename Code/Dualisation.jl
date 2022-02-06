@@ -1,11 +1,10 @@
-using JuMP, CPLEX, BenchmarkTools
+using JuMP, CPLEX, BenchmarkTools, DelimitedFiles
 
 include("Fonctions_Init.jl")
 
 # fichier à utiliser
 
-
-filename = "500_USA-road-d.BAY.gr"
+filename = "2000_USA-road-d.BAY.gr"
 path = string("./Code/Instances_ECMA/", filename)
 
 
@@ -100,13 +99,30 @@ function dualisation(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim = 6
     
     # affichage des resultats
     obj_value = JuMP.objective_value(model)
-    return obj_value
+    x_val = value.(model[:x])
+    y_val = value.(model[:y])
+    println("Objective value: ", obj_value)
+    return obj_value, x_val, y_val
 end
 
 
-# @benchmark dualisation(n, s, t, S, d1, d2, p, ph, Mat)
+# @benchmark dualisation(n, s, t, S, d1, d2, p, ph, Mat, time_lim = 0)
+# @btime dualisation(n, s, t, S, d1, d2, p, ph, Mat, time_lim = 0)
 
-obj_value = dualisation(n, s, t, S, d1, d2, p, ph, Mat)
+obj_value, x_val, y_val = dualisation(n, s, t, S, d1, d2, p, ph, Mat, time_lim = 0)
 println("Objective value: ", obj_value)
 
 
+sol_filename = string("SOL_", filename, ".txt")
+sol_path = string("Solutions/", sol_filename)
+open(sol_path, "w") do file
+    write(file, "valeur optimale : $obj_value\n")
+    write(file, "######## x :\n")
+    for a in x_val
+        write(file, "$a\n")
+    end
+    write(file, "######## y :\n")
+    for v in y_val
+        write(file, "$v\n")
+    end
+end

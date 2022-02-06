@@ -1,9 +1,9 @@
-using JuMP, CPLEX
+using JuMP, CPLEX, BenchmarkTools
 
 include("Fonctions_Init.jl")
 
 # fichier à utiliser
-filename = "20_USA-road-d.NY.gr"
+filename = "1600_USA-road-d.BAY.gr"
 path = string("./Code/Instances_ECMA/", filename)
 
 println("Résolution par plans coupants.")
@@ -115,10 +115,10 @@ function plans_coupants(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim 
     while abs(z1 - z_star) > 1e-4 || z2 > S     # Tant que ces deux conditions ne sont pas vérifiées
         if abs(z1 - z_star) > 1e-4
             @constraint(MP, z >= sum(durees[a]*(1 + delta1_star[a])*x[a] for a in 1:nb_arcs))
-            println("ajout d'une contrainte SP1")
+            # println("ajout d'une contrainte SP1")
         elseif z2 > S
             @constraint(MP, sum(y[v]*(p[v] + delta2_star[v]*ph[v]) for v in 1:n) <= S)
-            println("ajout d'une contrainte SP2")
+            # println("ajout d'une contrainte SP2")
         end
         
         # On relance la recherche de solution de MP
@@ -144,12 +144,13 @@ function plans_coupants(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim 
         delta1_star = value.(SP1[:delta1])
         delta2_star = value.(SP2[:delta2])
     end
+    println("Objective value: ", z_star)
     return z_star
 end
 
 
-# @benchmark plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
+@benchmark plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
 
-z_star = plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
-println("Objective value: ", z_star)
+# z_star = plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
+# println("Objective value: ", z_star)
 
