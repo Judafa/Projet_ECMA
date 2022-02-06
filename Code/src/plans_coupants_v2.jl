@@ -1,15 +1,18 @@
 using JuMP, CPLEX
 
+include("../Fonctions_Init.jl")
+
 # fichier à utiliser
-path = "20_USA-road-d.NY.gr"
+filename = "20_USA-road-d.NY.gr"
+path = string("../Instances_ECMA/", filename)
 
-function read_data(path)
-    include(path)
-    return n, s, t, S, d1, d2, p, ph, Mat
-end
+# function read_data(path)
+#     include(path)
+#     return n, s, t, S, d1, d2, p, ph, Mat
+# end
 
-# lecture et acquisition des données
-n, s, t, S, d1, d2, p, ph, Mat = read_data("../Instances_ECMA/20_USA-road-d.NY.gr")
+# lecture et acquisition des données avec la fonction de Fonctions_Init
+n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
 
 ######################### DONNEES #########################
 # n : nombre de sommets
@@ -101,15 +104,9 @@ function plans_coupants(n, nb_arcs, durees, D, d1, d2, p, ph)
         if abs(z1 - z_star) > 1e-4
             @constraint(MP, z >= sum(durees[a]*(1 + delta1_star[a])*x[a] for a in 1:nb_arcs))
             println("ajout d'une contrainte SP1")
-            # con = @build_constraint(z >= sum(durees[a]*(1 + delta1_star[a])*x[a] for a in 1:nb_arcs))
-            # println("Adding $(con)")
-            # MOI.submit(model, MOI.LazyConstraint(cb_data), con)
         elseif z2 > S
             @constraint(MP, sum(y[v]*(p[v] + delta2_star[v]*ph[v]) for v in 1:n) <= S)
             println("ajout d'une contrainte SP2")
-            # con = @build_constraint(sum(y[v]*(p[v] + delta2_star[v]*ph[v])) <= S)
-            # println("Adding $(con)")
-            # MOI.submit(model, MOI.LazyConstraint(cb_data), con)
         end
     
         JuMP.optimize!(MP)      # on relance la recherche de solution de MP
@@ -121,7 +118,6 @@ function plans_coupants(n, nb_arcs, durees, D, d1, d2, p, ph)
         z1, z2, delta1_star, delta2_star = generate_sub_problems(n, nb_arcs, durees, D, d1, d2, p, ph, x_star, y_star)
     end
     return z_star
-
 end
 
 
