@@ -4,7 +4,7 @@ include("Fonctions_Init.jl")
 
 # fichier à utiliser
 
-filename = "20_USA-road-d.BAY.gr"
+filename = "20_USA-road-d.NY.gr"
 path = string("./Code/Instances_ECMA/", filename)
 
 
@@ -35,8 +35,17 @@ n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
 # println("Mat = $Mat")
 
 
+"""
+Résout le problème par dualisation.
 
-function dualisation(n, s, t, S, d1, d2, p, ph, Mat; verbose=false)
+Prend en argument les données des fichiers <*.gr>.
+
+verbose = false désactive l'affichage.
+
+time_lim définit une limite pour l'optimisation, time_lim <= 0
+désactive cette limite.
+"""
+function dualisation(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim = 60.0)
     nb_arcs = size(Mat)[1]
     durees = Mat[:,3]
     D = Mat[:,4]
@@ -46,6 +55,10 @@ function dualisation(n, s, t, S, d1, d2, p, ph, Mat; verbose=false)
 
     if verbose == false
         set_silent(model)
+    end
+
+    if time_lim > 0
+        set_time_limit_sec(model, time_lim)
     end
     
     # variables
@@ -90,8 +103,8 @@ function dualisation(n, s, t, S, d1, d2, p, ph, Mat; verbose=false)
 end
 
 
-@benchmark dualisation(n, s, t, S, d1, d2, p, ph, Mat)
+# @benchmark dualisation(n, s, t, S, d1, d2, p, ph, Mat)
 
-# obj_value = dualisation(n, s, t, S, d1, d2, p, ph, Mat)
-# println("Objective value: ", obj_value)
+obj_value = dualisation(n, s, t, S, d1, d2, p, ph, Mat)
+println("Objective value: ", obj_value)
 
