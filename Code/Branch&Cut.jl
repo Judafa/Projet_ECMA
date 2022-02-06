@@ -190,11 +190,11 @@ function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, verbose_s
     return obj_value
 end
 
-path = "Code/Instances_ECMA/1500_USA-road-d.BAY.gr"
+path = "Code/Instances_ECMA/950_USA-road-d.BAY.gr"
 n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
 
 print("pour : ", path)
-@benchmark branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, verbose=false)
+@benchmark branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, verbose=false, utilise_heuristique_SP1=false, utilise_heuristique_SP2=false)
 
 # obj_value = branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, verbose=false)
 # print("valeur de l'objectif Branch&Cut : $obj_value")
