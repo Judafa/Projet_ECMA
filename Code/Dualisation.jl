@@ -5,7 +5,7 @@ include("Fonctions_Init.jl")
 # fichier à utiliser
 
 
-filename = "500_USA-road-d.BAY.gr"
+filename = "1000_USA-road-d.BAY.gr"
 path = string("./Code/Instances_ECMA/", filename)
 
 
@@ -106,7 +106,7 @@ end
 
 # @benchmark dualisation(n, s, t, S, d1, d2, p, ph, Mat)
 
-obj_value = dualisation(n, s, t, S, d1, d2, p, ph, Mat)
+obj_value = dualisation(n, s, t, S, d1, d2, p, ph, Mat, verbose=true)
 println("Objective value: ", obj_value)
 
 

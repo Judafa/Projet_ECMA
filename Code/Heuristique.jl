@@ -2,7 +2,7 @@ using JuMP
 using CPLEX
 
 # --------------------- Heuristique Gloutonne pour SP1
-function heuristique_SP1(d, D, d1, Aretes, x_val)
+function heuristique_SP1(d, D, d1, Aretes, x_val, delta1_glouton)
 
         traffic_aloue = 0
         aretes_alourdies = []
@@ -45,7 +45,7 @@ function heuristique_SP1(d, D, d1, Aretes, x_val)
 end
 
 
-function heuristique_SP2(p, ph, d2, Sommets, y_val)
+function heuristique_SP2(p, ph, d2, Sommets, y_val, delta2_glouton)
     poids_aloue = 0
     sommets_alourdis = []
     poids_min = Inf64

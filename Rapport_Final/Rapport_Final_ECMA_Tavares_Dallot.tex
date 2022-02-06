@@ -1,0 +1,60 @@
+\documentclass[11pt,a4paper]{exam}
+
+% For maths symbols
+\usepackage{amsmath, amssymb, bm}
+\usepackage{wasysym, bigints}
+\usepackage{graphicx}
+\usepackage{makecell}
+
+%Pour les affichages de graphiques
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat = newest}
+
+
+% Langue
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+
+\title{ECMA : Rapport Final}
+\author{Antonio Tavares, Julien Dallot}
+
+%Define a length between lines in linear problems
+\newlength{\interlinespace}\setlength{\interlinespace}{7mm}
+
+
+\usepackage{biblatex} %Imports biblatex package
+\addbibresource{references.bib} %Import the bibliography file
+
+\begin{document}
+\maketitle
+
+je \cite{Bouquin}
+
+\begin{tikzpicture}{H}
+	\begin{axis}[width=\textwidth*0.92,
+		ylabel={phase max cost},
+		xlabel={cluster capacity($k$)},
+		title={Max cost dependance of cluster capacity, with $l=2$}]
+		\addplot[domain=2:200, 
+		samples=100, color=red]{2*x*log2(x)};
+		\addlegendentry{$2 k \log_{2}(k)$}
+		
+		\addplot[
+		color=blue,
+		mark=square, mark size=1
+		]
+		coordinates {
+			(2,2)(3,6)(4,10)(5,18)(6,22)(7,32)(8,42)(9,50)(10,58)(11,70)(12,78)(13,88)(14,88)(15,102)(17,110)(20,144)(23,170)(25,190)(30,246)(40,378)(50,492)(60,594)(70,756)(80,850)(85,934)(100,1172)(140,1736)(200,2640)
+		};
+		\addlegendentry{empirical max cost}
+	\end{axis}
+\end{tikzpicture}
+
+\section{Heuristiques}
+
+Nous avons réalisé des heuristiques exactes pour les sous problèmes (SP1) et (SP2) en les réduisant à des problèmes de sac à dos continues, sur lesquels une heuristique gloutonne simple 
+
+\printbibliography
+\end{document}
+

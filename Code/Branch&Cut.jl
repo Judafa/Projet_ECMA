@@ -1,5 +1,6 @@
 using JuMP
 using CPLEX
+using BenchmarkTools
 
 
 include("Fonctions_Init.jl")
@@ -7,7 +8,7 @@ include("Heuristique.jl")
 
 # ------------------------------------------------------------- Lit le modèle
 
-function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, utilise_heuristique_SP1 = false, utilise_heuristique_SP2=true)
+function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, verbose_sous_probleme=false, utilise_heuristique_SP1 = false, utilise_heuristique_SP2=true)
 
     m = Model(CPLEX.Optimizer)
     MOI.set(m, MOI.NumberOfThreads(), 1)
@@ -90,8 +91,12 @@ function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, utilise_h
     # sinon créée le sous problème SP1
     else
         SP1 = Model(CPLEX.Optimizer)
+        if verbose_sous_probleme == false
+            set_silent(SP1)
+        end
         @variable(SP1, 0 <= delta1[a in Aretes] <= D[a])
         @constraint(SP1, borné_par_d1, sum(delta1[a] for a in Aretes) <= d1)
+        
     end
 
     # ---------------------------------------------------------- Initialise SP2 en fonction des options choisies
@@ -103,6 +108,9 @@ function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, utilise_h
         end
     else
         SP2 = Model(CPLEX.Optimizer)
+        if verbose_sous_probleme == false
+            set_silent(SP2)
+        end
         @variable(SP2, 0 <= delta2[v in Sommets] <= 2)
         @constraint(SP2, borné_par_d2, sum(delta2[v] for v in Sommets) <= d2)
     end
@@ -127,7 +135,7 @@ function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, utilise_h
             # -------------------------------------------------- Résout le sous problème SP1
             if utilise_heuristique_SP1
                 # Heuristique Gloutonne pour SP1
-                z1_glouton, delta1_glouton = heuristique_SP1(d, D, d1, Aretes, x_val)
+                z1_glouton, delta1_glouton = heuristique_SP1(d, D, d1, Aretes, x_val, delta1_glouton)
                 # Ajoute la contrainte de SP1
                 if z1_glouton > z_val 
                     cons1 = @build_constraint(sum(d[a] * (1 + delta1_glouton[a]) * x[a] for a in Aretes) <= z)
@@ -151,7 +159,7 @@ function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, utilise_h
             # -------------------------------------------------- Résout le sous problème SP2
             if utilise_heuristique_SP2
                 # Heuristique Gloutonne pour SP2
-                z2_glouton, delta2_glouton = heuristique_SP2(p, ph, d2, Sommets, y_val)
+                z2_glouton, delta2_glouton = heuristique_SP2(p, ph, d2, Sommets, y_val, delta2_glouton)
 
                 # Ajoute la coupe trouvée au problème maître
                 if z2_glouton > S
@@ -182,11 +190,12 @@ function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, utilise_h
     return obj_value
 end
 
-path = "Code/Instances_ECMA/1000_USA-road-d.BAY.gr"
+path = "Code/Instances_ECMA/1500_USA-road-d.BAY.gr"
 n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
 
+print("pour : ", path)
+@benchmark branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, verbose=false)
 
-obj_value = branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, utilise_heuristique_SP1=false)
-print("valeur de l'objectif Branch&Cut : $obj_value")
+# obj_value = branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, verbose=false)
+# print("valeur de l'objectif Branch&Cut : $obj_value")
 
-# @benchmark branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat)
