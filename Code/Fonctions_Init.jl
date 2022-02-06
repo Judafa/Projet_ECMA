@@ -24,8 +24,8 @@ function read_data(path)
         end
 
         # Pour la matrice Mat
-        Mat = zeros(size(data)[1] - 10, 4)
-        mat_lines = data[10:size(data)[1]-1]
+        Mat = zeros(size(data)[1] - 9, 4)
+        mat_lines = data[10:size(data)[1]]
 
         compteur = 1
         for line in mat_lines
@@ -47,3 +47,4 @@ function read_data(path)
 
     return n, s, t, S, d1, d2, p, ph, Mat
 end
+

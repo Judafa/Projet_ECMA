@@ -1,15 +1,12 @@
 using JuMP, CPLEX
 
 # fichier à utiliser
-path = "20_USA-road-d.BAY.gr"
+include("Fonctions_Init.jl")
 
-function read_data(path)
-    include(path)
-    return n, s, t, S, d1, d2, p, ph, Mat
-end
+path = "Instances_ECMA/100_USA-road-d.BAY.gr"
 
 # lecture et acquisition des données
-n, s, t, S, d1, d2, p, ph, Mat = read_data("20_USA-road-d.BAY.gr")
+n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
 
 ######################### DONNEES #########################
 # n : nombre de sommets
