@@ -1,15 +1,11 @@
 using JuMP, CPLEX
 
-include("../Fonctions_Init.jl")
+include("Fonctions_Init.jl")
 
 # fichier à utiliser
 filename = "20_USA-road-d.NY.gr"
-path = string("../Instances_ECMA/", filename)
+path = string("./Instances_ECMA/", filename)
 
-# function read_data(path)
-#     include(path)
-#     return n, s, t, S, d1, d2, p, ph, Mat
-# end
 
 # lecture et acquisition des données avec la fonction de Fonctions_Init
 n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
