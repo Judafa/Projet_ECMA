@@ -4,7 +4,7 @@ using CPLEX
 
 include("Fonctions_Init.jl")
 include("Heuristique.jl")
-path = "Instances_ECMA/200_USA-road-d.BAY.gr"
+path = "Instances_ECMA/400_USA-road-d.BAY.gr"
 
 # ------------------------------------------------------------- Lit le modèle
 n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
@@ -114,21 +114,29 @@ function my_cb_function(cb_data::CPLEX.CallbackContext, context_id::Clong)
         traffic_aloue = 0
         aretes_alourdies = []
         trouve_augmentation = true
+
+        ajout_traffic = 0
+
         while traffic_aloue < d1 && trouve_augmentation
             coeff_max = -Inf64
             a_max = [-1, -1]
             for a in Aretes
-                if x_val[a] == 1 && coeff_max < min(d1 - traffic_aloue, D[a]) * d[a] && a ∉ aretes_alourdies
-                    coeff_max = min(d1 - traffic_aloue, D[a]) 
+                # if x_val[a] == 1 && coeff_max < min(d1 - traffic_aloue, D[a]) * d[a] && a ∉ aretes_alourdies
+                #     coeff_max = min(d1 - traffic_aloue, D[a]) 
+                #     a_max = a
+                # end
+                if x_val[a] == 1 && coeff_max < D[a] * d[a] && a ∉ aretes_alourdies
+                    coeff_max = D[a] * d[a]
+                    ajout_traffic = min(d1 - traffic_aloue, D[a])
                     a_max = a
                 end
             end
             if a_max == [-1, -1]
                 trouve_augmentation = false
             else
-                traffic_aloue += coeff_max
+                traffic_aloue += ajout_traffic
                 push!(aretes_alourdies, a_max)
-                delta1_glouton[a_max] = coeff_max
+                delta1_glouton[a_max] = ajout_traffic
             end
         end
 
@@ -170,7 +178,48 @@ function my_cb_function(cb_data::CPLEX.CallbackContext, context_id::Clong)
         #     MOI.submit(m, MOI.LazyConstraint(cb_data), cons1)
         # end
 
+        # --------------------- Heuristique Gloutonne pour SP2
+        poids_aloue = 0
+        sommets_alourdis = []
+        trouve_augmentation = true
 
+        ajout_poids = 0
+
+        while poids_aloue < d2 && trouve_augmentation
+            coeff_max = -Inf64
+            v_max = -1
+            for v in Sommets
+                # if x_val[a] == 1 && coeff_max < min(d1 - traffic_aloue, D[a]) * d[a] && a ∉ sommets_alourdis
+                #     coeff_max = min(d1 - traffic_aloue, D[a]) 
+                #     v_max = a
+                # end
+                if y_val[v] == 1 && coeff_max < p[v] && v ∉ sommets_alourdis
+                    coeff_max = D[a] * d[a]
+                    ajout_poids = min(d1 - poids_aloue, D[a])
+                    v_max = a
+                end
+            end
+            if v_max == [-1, -1]
+                trouve_augmentation = false
+            else
+                poids_aloue += ajout_poids
+                push!(sommets_alourdis, v_max)
+                delta1_glouton[v_max] = ajout_poids
+            end
+        end
+
+        for a in Aretes
+            if a ∉ sommets_alourdis
+                delta1_glouton[a] = 0
+            end
+        end
+        
+        z1_glouton = sum(d[a] * (1 + delta1_glouton[a]) * x_val[a] for a in Aretes)
+
+        if z1_glouton > z_val 
+            # Ajoute solution gloutonne
+            cons1 = @build_constraint(sum(d[a] * (1 + delta1_glouton[a]) * x[a] for a in Aretes) <= z)
+            MOI.submit(m, MOI.LazyConstraint(cb_data), cons1)
 
         # Résout le sous problème SP2
         @objective(SP2, Max, sum((p[v] + delta2[v] * ph[v]) * y_val[v] for v in Sommets))
