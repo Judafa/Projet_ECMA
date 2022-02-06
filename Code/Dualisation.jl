@@ -4,7 +4,11 @@ include("Fonctions_Init.jl")
 
 # fichier à utiliser
 
+<<<<<<< Updated upstream:Code/Dualisation.jl
 filename = "20_USA-road-d.NY.gr"
+=======
+filename = "500_USA-road-d.BAY.gr"
+>>>>>>> Stashed changes:Code/dualisation.jl
 path = string("./Code/Instances_ECMA/", filename)
 
 
@@ -107,4 +111,5 @@ end
 
 obj_value = dualisation(n, s, t, S, d1, d2, p, ph, Mat)
 println("Objective value: ", obj_value)
+
 
