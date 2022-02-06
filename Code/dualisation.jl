@@ -3,7 +3,7 @@ using JuMP, CPLEX
 include("Fonctions_Init.jl")
 
 # fichier à utiliser
-filename = "20_USA-road-d.BAY.gr"
+filename = "400_USA-road-d.BAY.gr"
 path = string("./Instances_ECMA/", filename)
 
 
