@@ -4,65 +4,68 @@ using CPLEX
 include("Fonctions_Init.jl")
 
 # ------------------------------------------------------------- Lit le modèle
+
 # n, s, t, S, d1, d2, p, ph, Mat = read_data_include("Instances_ECMA/20_USA-road-d.NY.gr")
-n, s, t, S, d1, d2, p, ph, Mat = read_data("Instances_ECMA/200_USA-road-d.BAY.gr")
+n, s, t, S, d1, d2, p, ph, Mat = read_data("Instances_ECMA/20_USA-road-d.BAY.gr")
 # n, s, t, S, d1, d2, p, ph, Mat = read_data("Instances_ECMA/400_USA-road-d.BAY.gr")
 
+# nb_aretes est le Nombre d'arêtes
+nb_aretes = Int64(size(Mat)[1])
 
+epsilon = 1e-5
 
-# a est le Nombre d'arêtes
-a = Int64(size(Mat)[1])
+Aretes = Set()
+for e in 1:nb_aretes
+    push!(Aretes, [Int.(Mat[e, 1]), Int.(Mat[e, 2])])
+end
+
+Sommets = Set(1:n)
+
+# Inititialise les dij
+d = Dict()
+for e in 1:nb_aretes
+    d[[Int.(Mat[e, 1]), Int.(Mat[e, 2])]] = Mat[e, 3]
+end
+
+# Inititialise les Dij
+D = Dict()
+for e in 1:nb_aretes
+    D[[Int.(Mat[e, 1]), Int.(Mat[e, 2])]] = Mat[e, 4]
+end
 
 
 m = Model(CPLEX.Optimizer)
 
 # ------------------------------------------------------------- Initialise les variables
-# 1 si l'arête ij fait partie du chemin
-@variable(m, x[i in 1:n, j in 1:n], Bin)
 
+# 1 si l'arête ij fait partie du chemin
+@variable(m, x[a in Aretes], Bin)
 # 1 si le sommet i fait partie du chemin
-@variable(m, y[i in 1:n], Bin)
+@variable(m, y[i in Sommets], Bin)
 
 # ------------------------------------------------------------- Contraintes
 # Le chemin quitte s
-@constraint(m, quitte_s, sum(x[s, Int.(Mat[j, 2])] for j=1:a if Int.(Mat[j,1]) == s) == 1)
+@constraint(m, quitte_s, sum(x[a] for a in Aretes if a[1] == s) == 1)
 
 # Le chemin arrive en t
-@constraint(m, arrive_t, sum(x[Int.(Mat[j, 1]), t] for j=1:a if Int.(Mat[j,2]) == t) == 1)
+@constraint(m, arrive_t, sum(x[a] for a in Aretes if a[2] == t) == 1)
 
 # Conservation du flot
-@constraint(m, flot[v=1:n ; v != s && v != t], sum(x[v, Int.(Mat[j, 2])] for j=1:a if Int.(Mat[j,1]) == v) == sum(x[Int.(Mat[j, 1]), v] for j=1:a if Int.(Mat[j,2]) == v))
+@constraint(m, flot[v in Sommets ; v != s && v != t], sum(x[a] for a in Aretes if a[1] == v) == sum(x[a] for a in Aretes if a[2] == v))
 
 # Lien entre y et x
-@constraint(m, lien_y_v[v=1:n ; v!=t], y[v] == sum(x[v, Int.(Mat[j, 2])] for j=1:a if Int.(Mat[j,1]) == v))
+@constraint(m, lien_y_v[v in Sommets ; v!=t], y[v] == sum(x[a] for a in Aretes if a[1] == v))
 
-# @constraint(m, y[t] == sum(x[Int.(Mat[j, 1]), t] for j=1:a if Mat[j,2] == t))
 @constraint(m, t_choisi, y[t] == 1)
 
 # Contrainte sur le poids maximal
-@constraint(m, cons_poids_max, sum(p[v] * y[v] for v=1:n) <= S)
+@constraint(m, cons_poids_max, sum(p[v] * y[v] for v in Sommets) <= S)
 
 # --------------------------------------------------------- Objectif
-@objective(m, Min, sum(x[Int.(Mat[j, 1]), Int.(Mat[j, 2])] * Mat[j, 3] for j in 1:a))
+@objective(m, Min, sum(x[a] * d[a] for a in Aretes))
 
 
 optimize!(m)
 # print(m)
 print("sommets du chemin : ", value.(y), "\n")
 print("valeur de l'objectif : ", objective_value(m))
-
-
-# n = 6
-# K = 23
-# w = [1 3 5 7 9 11]
-# p = [1 2 4 5 7 10]
-
-# m = Model(CPLEX.Optimizer)
-
-# @variable(m, x[i in 1:n], Bin)
-# @constraint(m, sum(x[i] * w[i] for i = 1:n) <= K)
-# @objective(m, Max, sum(x[i] * p[i] for i in 1:n))
-
-# optimize!(m)
-
-# print("Solution : ", value.(x))
