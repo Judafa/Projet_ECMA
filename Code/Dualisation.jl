@@ -5,7 +5,7 @@ include("Fonctions_Init.jl")
 # fichier à utiliser
 
 
-filename = "2000_USA-road-d.BAY.gr"
+filename = "40_USA-road-d.BAY.gr"
 path = string("./Code/Instances_ECMA/", filename)
 
 
@@ -71,8 +71,8 @@ function dualisation(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim = 6
     @variable(model, z_p[1:n] >= 0)
     
     # contraintes
-    @constraint(model, sum(x[Mat[:,1] .== s]) == 1)     # un arc sortant de s
-    @constraint(model, sum(x[Mat[:,2] .== t]) == 1)     # un arc entrant en t
+    @constraint(model, sum(x[Mat[:,1] .== s]) - sum(x[Mat[:,2] .== s]) == 1)     # un arc sortant de s
+    @constraint(model, sum(x[Mat[:,2] .== t]) -  sum(x[Mat[:,1] .== t]) == 1)     # un arc entrant en t
     for v in 1:n
         if v != s && v !=t
             @constraint(model, sum(x[Mat[:,2] .== v]) == sum(x[Mat[:,1] .== v]))     # loi des noeuds

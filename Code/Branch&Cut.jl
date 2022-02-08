@@ -60,10 +60,10 @@ function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, verbose_s
 
     # ------------------------------------------------------------- Contraintes
     # Le chemin quitte s
-    @constraint(m, quitte_s, sum(x[a] for a in Aretes if a[1] == s) == 1)
+    @constraint(m, quitte_s, sum(x[a] for a in Aretes if a[1] == s) - sum(x[a] for a in Aretes if a[2] == s) == 1)
 
     # Le chemin arrive en t
-    @constraint(m, arrive_t, sum(x[a] for a in Aretes if a[2] == t) == 1)
+    @constraint(m, arrive_t, sum(x[a] for a in Aretes if a[2] == t) - sum(x[a] for a in Aretes if a[1] == t) == 1)
 
     # Conservation du flot
     @constraint(m, flot[v in Sommets ; v != s && v != t], sum(x[a] for a in Aretes if a[1] == v) == sum(x[a] for a in Aretes if a[2] == v))
@@ -190,12 +190,12 @@ function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, verbose_s
     return obj_value
 end
 
-path = "Code/Instances_ECMA/950_USA-road-d.BAY.gr"
+path = "Code/Instances_ECMA/40_USA-road-d.BAY.gr"
 n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
 
 print("pour : ", path)
-@benchmark branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, verbose=false, utilise_heuristique_SP1=false, utilise_heuristique_SP2=false)
+# @benchmark branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, verbose=false, utilise_heuristique_SP1=false, utilise_heuristique_SP2=false)
 
-# obj_value = branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, verbose=false)
-# print("valeur de l'objectif Branch&Cut : $obj_value")
+obj_value = branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, verbose=false, utilise_heuristique_SP1=false)
+print("valeur de l'objectif Branch&Cut : $obj_value")
 

@@ -9,7 +9,7 @@ include("Fonctions_Init.jl")
 # n, s, t, S, d1, d2, p, ph, Mat = read_data("Instances_ECMA/20_USA-road-d.BAY.gr")
 # n, s, t, S, d1, d2, p, ph, Mat = read_data("Instances_ECMA/400_USA-road-d.BAY.gr")
 
-filename = "1200_USA-road-d.BAY.gr"
+filename = "40_USA-road-d.BAY.gr"
 path = string("./Code/Instances_ECMA/", filename)
 # lecture et acquisition des données avec la fonction de Fonctions_Init
 n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
@@ -52,10 +52,10 @@ function statique(n, s, t, S, p, Mat)
     
     # ------------------------------------------------------------- Contraintes
     # Le chemin quitte s
-    @constraint(m, quitte_s, sum(x[a] for a in Aretes if a[1] == s) == 1)
-    
+    @constraint(m, quitte_s, sum(x[a] for a in Aretes if a[1] == s) - sum(x[a] for a in Aretes if a[2] == s) == 1)
+
     # Le chemin arrive en t
-    @constraint(m, arrive_t, sum(x[a] for a in Aretes if a[2] == t) == 1)
+    @constraint(m, arrive_t, sum(x[a] for a in Aretes if a[2] == t) - sum(x[a] for a in Aretes if a[1] == t) == 1)
     
     # Conservation du flot
     @constraint(m, flot[v in Sommets ; v != s && v != t], sum(x[a] for a in Aretes if a[1] == v) == sum(x[a] for a in Aretes if a[2] == v))
