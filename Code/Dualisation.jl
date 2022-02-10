@@ -5,7 +5,7 @@ include("Fonctions_Init.jl")
 # fichier à utiliser
 
 
-filename = "40_USA-road-d.BAY.gr"
+filename = "60_USA-road-d.BAY.gr"
 path = string("./Code/Instances_ECMA/", filename)
 
 
@@ -102,7 +102,7 @@ function dualisation(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim = 6
     obj_value = JuMP.objective_value(model)
     x_val = value.(model[:x])
     y_val = value.(model[:y])
-    println("Objective value: ", obj_value)
+    # println("Objective value: ", obj_value)
     return obj_value, x_val, y_val
 end
 
@@ -111,20 +111,37 @@ end
 # @btime dualisation(n, s, t, S, d1, d2, p, ph, Mat, time_lim = 0)
 
 
-obj_value, x_val, y_val = dualisation(n, s, t, S, d1, d2, p, ph, Mat, time_lim = 0)
-println("Objective value: ", obj_value)
+# obj_value, x_val, y_val = dualisation(n, s, t, S, d1, d2, p, ph, Mat, time_lim = 0)
+# println("Objective value: ", obj_value)
 
 
-sol_filename = string("SOL_", filename, ".txt")
-sol_path = string("Solutions/", sol_filename)
-open(sol_path, "w") do file
-    write(file, "valeur optimale : $obj_value\n")
-    write(file, "######## x :\n")
-    for a in x_val
-        write(file, "$a\n")
-    end
-    write(file, "######## y :\n")
-    for v in y_val
-        write(file, "$v\n")
+# sol_filename = string("SOL_", filename, ".txt")
+# sol_path = string("Solutions/", sol_filename)
+# open(sol_path, "w") do file
+#     write(file, "valeur optimale : $obj_value\n")
+#     write(file, "######## x :\n")
+#     for a in x_val
+#         write(file, "$a\n")
+#     end
+#     write(file, "######## y :\n")
+#     for v in y_val
+#         write(file, "$v\n")
+#     end
+# end
+
+function benchmark_dualisation(instances, path_fichier)
+    touch(path_fichier)
+    for nb in instances
+
+        path_instance = "Code/Instances_ECMA/$(nb)_USA-road-d.BAY.gr"
+        n, s, t, S, d1, d2, p, ph, Mat = read_data(path_instance)
+
+
+        temps = @belapsed dualisation(n, s, t, S, d1, d2, p, ph, Mat)
+        print("Pour nb = $(nb) avec dualisation, temps = $(temps)\n")
+
+        fichier = open(path_fichier,"a")
+        write(fichier, "$(nb) $(temps)\n")
+        close(fichier)
     end
 end

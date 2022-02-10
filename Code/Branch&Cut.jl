@@ -187,15 +187,37 @@ function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, verbose_s
     optimize!(m)
 
     obj_value = JuMP.objective_value(m)
-    return obj_value
+    x_val = value.(m[:x])
+    y_val = value.(m[:y])
+    # println("Objective value: ", obj_value)
+    return obj_value, x_val, y_val
 end
 
-path = "Code/Instances_ECMA/40_USA-road-d.BAY.gr"
+path = "Code/Instances_ECMA/60_USA-road-d.BAY.gr"
 n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
 
-print("pour : ", path)
-# @benchmark branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, verbose=false, utilise_heuristique_SP1=false, utilise_heuristique_SP2=false)
+# print("pour : ", path)
+# # @benchmark branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, verbose=false, utilise_heuristique_SP1=false, utilise_heuristique_SP2=true)
 
-obj_value = branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, verbose=false, utilise_heuristique_SP1=false)
-print("valeur de l'objectif Branch&Cut : $obj_value")
 
+# # branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, verbose=false, utilise_heuristique_SP1=true, utilise_heuristique_SP2=true)
+
+
+# temps = @belapsed branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, verbose=false, utilise_heuristique_SP1=false, utilise_heuristique_SP2=true)
+# print(temps)
+
+function benchmark_b_and_cut(instances, path_fichier)
+    touch(path_fichier)
+    for nb in instances
+
+        path_instance = "Code/Instances_ECMA/$(nb)_USA-road-d.BAY.gr"
+        n, s, t, S, d1, d2, p, ph, Mat = read_data(path_instance)
+
+        temps = @belapsed branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat)
+        print("Pour nb = $(nb) avec branch & cut, temps = $(temps)\n")
+
+        fichier = open(path_fichier,"a")
+        write(fichier, "$(nb) $(temps)\n")
+        close(fichier)
+    end
+end

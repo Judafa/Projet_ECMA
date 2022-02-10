@@ -3,7 +3,7 @@ using JuMP, CPLEX, BenchmarkTools
 include("Fonctions_Init.jl")
 
 # fichier à utiliser
-filename = "40_USA-road-d.BAY.gr"
+filename = "20_USA-road-d.BAY.gr"
 path = string("./Code/Instances_ECMA/", filename)
 
 println("Résolution par plans coupants.")
@@ -65,8 +65,10 @@ function plans_coupants(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim 
     @variable(MP, y[1:n], Bin)
     # contraintes
     @constraint(MP, z >= sum(durees[a]*x[a] for a in 1:nb_arcs))     # U1* composé de d_{ij} uniquement donc durees1 = durees
-    @constraint(MP, sum(x[Mat[:,1] .== s]) - sum(x[Mat[:,2] .== s]) == 1)     # un arc sortant de s
-    @constraint(MP, sum(x[Mat[:,2] .== t]) -  sum(x[Mat[:,1] .== t]) == 1)     # un arc entrant en t
+    @constraint(MP, sum(x[Mat[:,1] .== s]) == 1)     # un arc sortant de s
+    @constraint(MP, sum(x[Mat[:,2] .== s]) == 0)     # aucun arc ne rentre dans s
+    @constraint(MP, sum(x[Mat[:,2] .== t]) == 1)     # un arc entrant en t
+    @constraint(MP, sum(x[Mat[:,1] .== t]) == 0)     # aucun arc ne rentre dans t
     for v in 1:n
         if v != s && v !=t
             @constraint(MP, sum(x[Mat[:,2] .== v]) == sum(x[Mat[:,1] .== v]))     # loi des noeuds
@@ -144,13 +146,28 @@ function plans_coupants(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim 
         delta1_star = value.(SP1[:delta1])
         delta2_star = value.(SP2[:delta2])
     end
-    println("Objective value: ", z_star)
+    # println("Objective value: ", z_star)
     return z_star
 end
 
 
 # @benchmark plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
 
-z_star = plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
-println("Objective value: ", z_star)
+# z_star = plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
+# println("Objective value: ", z_star)
 
+
+function benchmark_plans_coupants(instances, path_fichier)
+    touch(path_fichier)
+    for nb in instances
+
+        path_instance = "Code/Instances_ECMA/$(nb)_USA-road-d.BAY.gr"
+        n, s, t, S, d1, d2, p, ph, Mat = read_data(path_instance)
+        temps = @belapsed plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
+        print("Pour nb = $(nb) avec plans coupants, temps = $(temps)\n")
+
+        fichier = open(path_fichier,"a")
+        write(fichier, "$(nb) $(temps)\n")
+        close(fichier)
+    end
+end

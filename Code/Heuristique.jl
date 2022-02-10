@@ -13,20 +13,17 @@ function heuristique_SP1(d, D, d1, Aretes, x_val, delta1_glouton)
         while traffic_aloue < d1 && trouve_augmentation
             coeff_max = -Inf64
             a_max = [-1, -1]
+
             for a in Aretes
-                # if x_val[a] == 1 && coeff_max < min(d1 - traffic_aloue, D[a]) * d[a] && a ∉ aretes_alourdies
-                #     coeff_max = min(d1 - traffic_aloue, D[a]) 
-                #     a_max = a
-                # end
-                if x_val[a] == 1 && coeff_max < D[a] * d[a] && a ∉ aretes_alourdies
-                    coeff_max = D[a] * d[a]
-                    ajout_traffic = min(d1 - traffic_aloue, D[a])
+                if x_val[a] == 1 && coeff_max <= d[a] && a ∉ aretes_alourdies
+                    coeff_max = d[a]
                     a_max = a
                 end
             end
             if a_max == [-1, -1]
                 trouve_augmentation = false
             else
+                ajout_traffic = min(d1 - traffic_aloue, D[a_max])
                 traffic_aloue += ajout_traffic
                 push!(aretes_alourdies, a_max)
                 delta1_glouton[a_max] = ajout_traffic
@@ -39,11 +36,10 @@ function heuristique_SP1(d, D, d1, Aretes, x_val, delta1_glouton)
             end
         end
         
-        z1_glouton = sum(d[a] * (1 + delta1_glouton[a]) * x_val[a] for a in Aretes)
+    z1_glouton = sum(d[a] * (1 + delta1_glouton[a]) * x_val[a] for a in Aretes)
 
     return(z1_glouton, delta1_glouton)
 end
-
 
 function heuristique_SP2(p, ph, d2, Sommets, y_val, delta2_glouton)
     poids_aloue = 0
@@ -86,7 +82,7 @@ function heuristique_SP2(p, ph, d2, Sommets, y_val, delta2_glouton)
         if v in sommets_alourdis && v != sommet_min
             delta2_glouton[v] = ph[v]
         elseif v == sommet_min
-            delta2_glouton[v] = d2 - sum(ph[s] for s in sommets_alourdis) + ph[s]
+            delta2_glouton[v] = min(d2 - sum(ph[s] for s in sommets_alourdis) + ph[v], ph[v])
         else
             delta2_glouton[v] = 0
         end
