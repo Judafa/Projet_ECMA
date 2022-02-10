@@ -12,23 +12,7 @@ function read_data_benchmark(path)
         myFile = open(path)
         # Lire toutes les lignes d’un fichier
         data = readlines(myFile)
-
-        s = ""
-        # Pour chaque ligne du fichier
-        for (i, line) in enumerate(data)
-            if i <= 8
-                # Afficher la ligne
-                eval(Meta.parse(line))
-            else
-                s = s * line
-            end
-
-        end
-
-        eval(Meta.parse(s))
-        
-
-        # Mat = readdlm(myFile, ' ', Float64, ';', skipstart=10)
+        close(myFile)
 
         # Fermer le fichier
         close(myFile)
@@ -36,6 +20,30 @@ function read_data_benchmark(path)
         print("fichier pas trouvé")
     end
 
+
+
+    Mat = zeros(size(data)[1] - 9, 4)
+    # Pour chaque ligne du fichier
+    for (i, line) in enumerate(data)
+        if i <= 8
+            # Afficher la ligne
+            eval(Meta.parse(line))
+        elseif i < size(data)[1] && i >= 10
+            line = replace(line,";" => "" )
+            line = replace(line,"]" => "" )
+            # sépare la ligne par coefficients
+            coeffs = split(line, " ")
+
+            Mat[i - 9, 1] = tryparse(Int64, coeffs[1])
+            Mat[i - 9, 2] = tryparse(Int64, coeffs[2])
+            Mat[i - 9, 3] = tryparse(Int64, coeffs[3])
+            Mat[i - 9, 4] = tryparse(Float64, coeffs[4])
+        end
+
+    end
+    
+
+    # Mat = readdlm(myFile, ' ', Float64, ';', skipstart=10)
 
     return n, s, t, S, d1, d2, p, ph, Mat
 end
@@ -93,7 +101,7 @@ end
 #             120, 140, 160, 180, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000,
 #             1100, 1200, 1300, 1400, 1500, 1600, 1700]
 
-instances = [20, 40, 60]
+instances = [20]
 
 path_dualisation = "Rapport_Final/Résultats/résultats_dualisation.txt"
 benchmark_dualisation(instances, path_dualisation)
