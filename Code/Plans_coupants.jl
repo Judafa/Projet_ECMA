@@ -2,15 +2,15 @@ using JuMP, CPLEX, BenchmarkTools
 
 include("Fonctions_Init.jl")
 
-# fichier à utiliser
-filename = "20_USA-road-d.BAY.gr"
-path = string("./Code/Instances_ECMA/", filename)
+# # fichier à utiliser
+# filename = "20_USA-road-d.BAY.gr"
+# path = string("./Code/Instances_ECMA/", filename)
 
-println("Résolution par plans coupants.")
+# println("Résolution par plans coupants.")
 
 
-# lecture et acquisition des données avec la fonction de Fonctions_Init
-n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
+# # lecture et acquisition des données avec la fonction de Fonctions_Init
+# n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
 
 ######################### DONNEES #########################
 # n : nombre de sommets
@@ -155,19 +155,3 @@ end
 
 # z_star = plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
 # println("Objective value: ", z_star)
-
-
-function benchmark_plans_coupants(instances, path_fichier)
-    touch(path_fichier)
-    for nb in instances
-
-        path_instance = "Code/Instances_ECMA/$(nb)_USA-road-d.BAY.gr"
-        n, s, t, S, d1, d2, p, ph, Mat = read_data(path_instance)
-        temps = @belapsed plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
-        print("Pour nb = $(nb) avec plans coupants, temps = $(temps)\n")
-
-        fichier = open(path_fichier,"a")
-        write(fichier, "$(nb) $(temps)\n")
-        close(fichier)
-    end
-end

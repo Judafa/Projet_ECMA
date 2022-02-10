@@ -5,12 +5,12 @@ include("Fonctions_Init.jl")
 # fichier à utiliser
 
 
-filename = "60_USA-road-d.BAY.gr"
-path = string("./Code/Instances_ECMA/", filename)
+# filename = "60_USA-road-d.BAY.gr"
+# path = string("./Code/Instances_ECMA/", filename)
 
 
-# lecture et acquisition des données avec la fonction de Fonctions_Init
-n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
+# # lecture et acquisition des données avec la fonction de Fonctions_Init
+# n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
 
 ######################### DONNEES #########################
 # n : nombre de sommets
@@ -128,20 +128,3 @@ end
 #         write(file, "$v\n")
 #     end
 # end
-
-function benchmark_dualisation(instances, path_fichier)
-    touch(path_fichier)
-    for nb in instances
-
-        path_instance = "Code/Instances_ECMA/$(nb)_USA-road-d.BAY.gr"
-        n, s, t, S, d1, d2, p, ph, Mat = read_data(path_instance)
-
-
-        temps = @belapsed dualisation(n, s, t, S, d1, d2, p, ph, Mat)
-        print("Pour nb = $(nb) avec dualisation, temps = $(temps)\n")
-
-        fichier = open(path_fichier,"a")
-        write(fichier, "$(nb) $(temps)\n")
-        close(fichier)
-    end
-end
