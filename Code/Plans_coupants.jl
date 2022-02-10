@@ -1,16 +1,17 @@
 using JuMP, CPLEX, BenchmarkTools
 
-include("Fonctions_Init.jl")
+
+# include("Benchmarks.jl")
 
 # # fichier à utiliser
-# filename = "20_USA-road-d.BAY.gr"
+# filename = "1000_USA-road-d.BAY.gr"
 # path = string("./Code/Instances_ECMA/", filename)
 
 # println("Résolution par plans coupants.")
 
 
 # # lecture et acquisition des données avec la fonction de Fonctions_Init
-# n, s, t, S, d1, d2, p, ph, Mat = read_data(path)
+# n, s, t, S, d1, d2, p, ph, Mat = read_data_benchmark(path)
 
 ######################### DONNEES #########################
 # n : nombre de sommets
@@ -46,6 +47,8 @@ verbose = false désactive l'affichage.
 
 time_lim définit une limite pour l'optimisation, time_lim <= 0
 désactive cette limite.
+
+Retourne la valeur de la solution trouvée.
 """
 function plans_coupants(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim = 60.0)
     nb_arcs = size(Mat)[1]
@@ -113,7 +116,8 @@ function plans_coupants(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim 
     delta1_star = value.(SP1[:delta1])
     delta2_star = value.(SP2[:delta2])
 
-
+    start_time = time()
+    reached_time_lim = false
     while abs(z1 - z_star) > 1e-4 || z2 > S     # Tant que ces deux conditions ne sont pas vérifiées
         if abs(z1 - z_star) > 1e-4
             @constraint(MP, z >= sum(durees[a]*(1 + delta1_star[a])*x[a] for a in 1:nb_arcs))
@@ -145,8 +149,17 @@ function plans_coupants(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim 
         # Nouvelles valeurs des variables des sous-problèmes
         delta1_star = value.(SP1[:delta1])
         delta2_star = value.(SP2[:delta2])
+
+        if time() - start_time > time_lim
+            reached_time_lim = true
+            break
+        end
     end
-    # println("Objective value: ", z_star)
+    println("Instance : $(n)_USA-road-d.BAY.gr")
+    println("Objective value: ", z_star)
+    if reached_time_lim
+        println("Time limit of $time_lim seconds reached.")
+    end
     return z_star
 end
 
@@ -155,3 +168,22 @@ end
 
 # z_star = plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
 # println("Objective value: ", z_star)
+
+
+# function benchmark_plans_coupants(instances, path_fichier)
+#     touch(path_fichier)
+#     for nb in instances
+
+#         path_instance = "Code/Instances_ECMA/$(nb)_USA-road-d.BAY.gr"
+#         n, s, t, S, d1, d2, p, ph, Mat = read_data(path_instance)
+#         temps = @belapsed plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
+#         print("Pour nb = $(nb) avec plans coupants, temps = $(temps)\n")
+
+#         fichier = open(path_fichier,"a")
+#         write(fichier, "$(nb) $(temps)\n")
+#         close(fichier)
+#     end
+# end
+
+# z_star = plans_coupants(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim = 10.0)
+# println("valeur de la solution : $z_star")

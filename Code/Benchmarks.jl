@@ -54,7 +54,7 @@ function benchmark_plans_coupants(instances, path_fichier)
 
         path_instance = "Code/Instances_ECMA/$(nb)_USA-road-d.BAY.gr"
         n, s, t, S, d1, d2, p, ph, Mat = read_data_benchmark(path_instance)
-        temps = @belapsed plans_coupants(n, s, t, S, d1, d2, p, ph, Mat)
+        temps = @elapsed plans_coupants(n, s, t, S, d1, d2, p, ph, Mat, time_lim = 5.0)
         print("Pour nb = $(nb) avec plans coupants, temps = $(temps)\n")
 
         fichier = open(path_fichier,"a")
@@ -70,7 +70,7 @@ function benchmark_b_and_cut(instances, path_fichier)
         path_instance = "Code/Instances_ECMA/$(nb)_USA-road-d.BAY.gr"
         n, s, t, S, d1, d2, p, ph, Mat = read_data_benchmark(path_instance)
 
-        temps = @belapsed branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat)
+        temps = @elapsed branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat, time_lim = 5.0)
         print("Pour nb = $(nb) avec branch & cut, temps = $(temps)\n")
 
         fichier = open(path_fichier,"a")
@@ -86,8 +86,7 @@ function benchmark_dualisation(instances, path_fichier)
         path_instance = "Code/Instances_ECMA/$(nb)_USA-road-d.BAY.gr"
         n, s, t, S, d1, d2, p, ph, Mat = read_data_benchmark(path_instance)
 
-
-        temps = @belapsed dualisation(n, s, t, S, d1, d2, p, ph, Mat)
+        temps = @elapsed dualisation(n, s, t, S, d1, d2, p, ph, Mat, time_lim = 5.0)
         print("Pour nb = $(nb) avec dualisation, temps = $(temps)\n")
 
         fichier = open(path_fichier,"a")
@@ -101,7 +100,7 @@ end
 #             120, 140, 160, 180, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000,
 #             1100, 1200, 1300, 1400, 1500, 1600, 1700]
 
-instances = [20]
+instances = [20, 40, 1000]
 
 path_dualisation = "Rapport_Final/Résultats/résultats_dualisation.txt"
 benchmark_dualisation(instances, path_dualisation)

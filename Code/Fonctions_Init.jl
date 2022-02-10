@@ -1,5 +1,4 @@
-
- using DelimitedFiles
+using DelimitedFiles
 
 function read_data_include(path)
 

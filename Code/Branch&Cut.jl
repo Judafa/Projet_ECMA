@@ -8,13 +8,17 @@ include("Heuristique.jl")
 
 # ------------------------------------------------------------- Lit le modèle
 
-function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, verbose_sous_probleme=false, utilise_heuristique_SP1 = false, utilise_heuristique_SP2=true)
+function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat;
+     verbose=false, verbose_sous_probleme=false, utilise_heuristique_SP1 = false, utilise_heuristique_SP2=true, time_lim = 60.0)
 
     m = Model(CPLEX.Optimizer)
     MOI.set(m, MOI.NumberOfThreads(), 1)
 
     if verbose == false
         set_silent(m)
+    end
+    if time_lim > 0
+        set_time_limit_sec(m, time_lim)
     end
 
     # nb_aretes est le Nombre d'arêtes
@@ -94,6 +98,9 @@ function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, verbose_s
         if verbose_sous_probleme == false
             set_silent(SP1)
         end
+        if time_lim > 0
+            set_time_limit_sec(SP1, time_lim)
+        end
         @variable(SP1, 0 <= delta1[a in Aretes] <= D[a])
         @constraint(SP1, borné_par_d1, sum(delta1[a] for a in Aretes) <= d1)
         
@@ -110,6 +117,9 @@ function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, verbose_s
         SP2 = Model(CPLEX.Optimizer)
         if verbose_sous_probleme == false
             set_silent(SP2)
+        end
+        if time_lim > 0
+            set_time_limit_sec(SP2, time_lim)
         end
         @variable(SP2, 0 <= delta2[v in Sommets] <= 2)
         @constraint(SP2, borné_par_d2, sum(delta2[v] for v in Sommets) <= d2)

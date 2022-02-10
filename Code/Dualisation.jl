@@ -1,11 +1,10 @@
 using JuMP, CPLEX, BenchmarkTools, DelimitedFiles
 
-include("Fonctions_Init.jl")
 
-# fichier à utiliser
+# include("Benchmarks.jl")
 
-
-# filename = "60_USA-road-d.BAY.gr"
+# # fichier à utiliser
+# filename = "1000_USA-road-d.BAY.gr"
 # path = string("./Code/Instances_ECMA/", filename)
 
 
@@ -103,6 +102,8 @@ function dualisation(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim = 6
     x_val = value.(model[:x])
     y_val = value.(model[:y])
     # println("Objective value: ", obj_value)
+    println("Instance : $(n)_USA-road-d.BAY.gr")
+    println("Objective value: ", obj_value)
     return obj_value, x_val, y_val
 end
 
