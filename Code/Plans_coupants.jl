@@ -51,6 +51,9 @@ désactive cette limite.
 Retourne la valeur de la solution trouvée.
 """
 function plans_coupants(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim = 60.0)
+    start_time = time()
+    reached_time_lim = false
+
     nb_arcs = size(Mat)[1]
     durees = Mat[:,3]
     D = Mat[:,4]
@@ -116,9 +119,8 @@ function plans_coupants(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim 
     delta1_star = value.(SP1[:delta1])
     delta2_star = value.(SP2[:delta2])
 
-    start_time = time()
-    reached_time_lim = false
-    while abs(z1 - z_star) > 1e-4 || z2 > S     # Tant que ces deux conditions ne sont pas vérifiées
+    elapsed_time = time() - start_time
+    while (abs(z1 - z_star) > 1e-4 || z2 > S) && elapsed_time <= time_lim    # Tant que ces deux conditions ne sont pas vérifiées
         if abs(z1 - z_star) > 1e-4
             @constraint(MP, z >= sum(durees[a]*(1 + delta1_star[a])*x[a] for a in 1:nb_arcs))
             # println("ajout d'une contrainte SP1")
@@ -150,12 +152,16 @@ function plans_coupants(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim 
         delta1_star = value.(SP1[:delta1])
         delta2_star = value.(SP2[:delta2])
 
-        if time() - start_time > time_lim
+        elapsed_time = time() - start_time
+        if elapsed_time > time_lim
             reached_time_lim = true
             break
         end
     end
-    println("Instance : $(n)_USA-road-d.BAY.gr")
+    if elapsed_time > time_lim
+        reached_time_lim = true
+    end
+    # println("Instance : $(n)_USA-road-d.BAY.gr")
     println("Objective value: ", z_star)
     if reached_time_lim
         println("Time limit of $time_lim seconds reached.")

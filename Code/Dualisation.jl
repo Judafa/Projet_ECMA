@@ -97,14 +97,19 @@ function dualisation(n, s, t, S, d1, d2, p, ph, Mat; verbose=false, time_lim = 6
     
     JuMP.optimize!(model)
     
+    # println("Instance : $(n)_USA-road-d.BAY.gr")
     # affichage des resultats
-    obj_value = JuMP.objective_value(model)
-    x_val = value.(model[:x])
-    y_val = value.(model[:y])
-    # println("Objective value: ", obj_value)
-    println("Instance : $(n)_USA-road-d.BAY.gr")
-    println("Objective value: ", obj_value)
-    return obj_value, x_val, y_val
+    if has_values(model)
+        obj_value = JuMP.objective_value(model)
+        println("Objective value: ", obj_value)
+        x_val = value.(model[:x])
+        y_val = value.(model[:y])
+        return obj_value, x_val, y_val
+    else
+        best_bound = objective_bound(model)
+        println("No solution found, best bound: $best_bound")
+        return best_bound
+    end
 end
 
 

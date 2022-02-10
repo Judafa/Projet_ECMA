@@ -196,11 +196,17 @@ function branch_and_cut(n, s, t, S, d1, d2, p, ph, Mat;
     MOI.set(m, CPLEX.CallbackFunction(), my_cb_function)
     optimize!(m)
 
-    obj_value = JuMP.objective_value(m)
-    x_val = value.(m[:x])
-    y_val = value.(m[:y])
-    # println("Objective value: ", obj_value)
-    return obj_value, x_val, y_val
+    if has_values(m)
+        obj_value = JuMP.objective_value(m)
+        println("Objective value: ", obj_value)
+        x_val = value.(m[:x])
+        y_val = value.(m[:y])
+        return obj_value, x_val, y_val
+    else
+        best_bound = objective_bound(m)
+        println("No solution found, best bound: $best_bound")
+        return best_bound
+    end
 end
 
 # path = "Code/Instances_ECMA/60_USA-road-d.BAY.gr"
